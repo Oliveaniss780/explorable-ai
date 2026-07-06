@@ -1,0 +1,219 @@
+@use "../../styles/variables.scss" as *;
+
+.explorable {
+  margin: 2rem 0;
+  padding: 1.4rem;
+  border: 1px solid var(--lightgray);
+  background-color: color-mix(in srgb, var(--secondary) 4%, transparent);
+
+  &:not(.explorable-ready)::before {
+    content: "loading…";
+    color: var(--gray);
+    font-size: 0.8rem;
+  }
+}
+
+.explorable-note {
+  margin: 0.9rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--gray);
+  font-style: italic;
+}
+
+.explorable-input {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--bodyFont);
+  font-size: 0.95rem;
+  color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 0;
+
+  &:focus {
+    outline: none;
+    border-color: var(--secondary);
+  }
+}
+
+.explorable-svg,
+.explorable-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.5rem;
+}
+
+.explorable-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+
+  & > span {
+    font-family: var(--bodyFont);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  & input[type="range"] {
+    width: 100%;
+    accent-color: var(--tertiary);
+  }
+}
+
+.explorable-btn {
+  margin-bottom: 1rem;
+  padding: 0.4rem 1rem;
+  font-family: var(--bodyFont);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--light);
+  background-color: var(--tertiary);
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--tertiary) 85%, black);
+  }
+}
+
+// ── tokenizer chips ──────────────────────────────────────────────────────────
+.token-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 0.9rem;
+}
+
+.token-chip {
+  padding: 2px 7px;
+  font-family: var(--codeFont, monospace);
+  font-size: 0.85rem;
+  color: var(--dark);
+  border-radius: 3px;
+  white-space: pre;
+  background-color: color-mix(in srgb, var(--secondary) 18%, transparent);
+
+  &[style*="--i:1"],
+  &[style*="--i: 1"] {
+    background-color: color-mix(in srgb, var(--tertiary) 18%, transparent);
+  }
+  &[style*="--i:2"],
+  &[style*="--i: 2"] {
+    background-color: color-mix(in srgb, var(--secondary) 30%, transparent);
+  }
+  &[style*="--i:3"],
+  &[style*="--i: 3"] {
+    background-color: color-mix(in srgb, var(--tertiary) 28%, transparent);
+  }
+  &[style*="--i:4"],
+  &[style*="--i: 4"] {
+    background-color: color-mix(in srgb, var(--secondary) 12%, transparent);
+  }
+  &[style*="--i:5"],
+  &[style*="--i: 5"] {
+    background-color: color-mix(in srgb, var(--tertiary) 12%, transparent);
+  }
+}
+
+// ── embeddings map ───────────────────────────────────────────────────────────
+.emb-node {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  & .emb-label {
+    font-family: var(--bodyFont);
+    font-size: 13px;
+  }
+
+  &.dim {
+    opacity: 0.28;
+  }
+  &.active .emb-label {
+    font-weight: 700;
+  }
+  &:focus {
+    outline: none;
+  }
+}
+
+// ── attention ────────────────────────────────────────────────────────────────
+.attn-sentence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0.4rem;
+  font-size: 1.15rem;
+}
+
+.attn-token {
+  --attn: 0;
+  padding: 4px 9px;
+  font-family: var(--bodyFont);
+  font-size: 1.05rem;
+  color: var(--dark);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: color-mix(in srgb, var(--tertiary) calc(var(--attn) * 85%), transparent);
+  transition: background-color 0.2s ease;
+
+  &.query {
+    border-color: var(--secondary);
+    font-weight: 700;
+  }
+  &:hover {
+    border-color: var(--gray);
+  }
+}
+
+// ── temperature bars ─────────────────────────────────────────────────────────
+.temp-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.temp-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.temp-name {
+  flex: 0 0 3.2rem;
+  font-family: var(--codeFont, monospace);
+  font-size: 0.9rem;
+  color: var(--darkgray);
+  text-align: right;
+}
+
+.temp-track {
+  flex: 1;
+  height: 16px;
+  background-color: color-mix(in srgb, var(--gray) 15%, transparent);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.temp-fill {
+  height: 100%;
+  width: 0;
+  background-color: var(--tertiary);
+  transition: width 0.18s ease;
+}
+
+.temp-pct {
+  flex: 0 0 2.6rem;
+  font-size: 0.8rem;
+  color: var(--gray);
+  font-variant-numeric: tabular-nums;
+}

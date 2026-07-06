@@ -28,6 +28,7 @@ import Navbar from "./Navbar"
 import ShareButtons from "./ShareButtons"
 import Newsletter from "./Newsletter"
 import Pwa from "./Pwa"
+import Explorables from "./Explorables"
 
 export {
   ArticleTitle,
@@ -60,4 +61,5 @@ export {
   ShareButtons,
   Newsletter,
   Pwa,
+  Explorables,
 }

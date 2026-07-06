@@ -5,21 +5,21 @@ tags:
 ---
 
 ```poetry
-Welcome!
+Explorable AI.
 ```
 
-I'm Oliveaniss. This is my little [[thoughts/hypertext|hypertext]] [[posts/networked-thought|garden]] on the [[thoughts/Internet|Internet]] -- make yourself at home!
+Welcome. This is a garden of **interactive explainers** for how modern AI actually works — not hype, not equations for their own sake, but ideas you can _touch_. Every explainer has a live widget: type into it, drag it, watch it learn.
 
-Currently, I'm exploring what [[posts/agentic-computing|agentic and communal]] technology looks like at [Replit](https://replit.com/). How might we create infrastructures and technologies that empower the residents of the web to have access to the same tools as the architects?
+Start with the five that build on each other:
 
-On a broader level, I care deeply about creating _[spaces](https://lu.ma/playspace)_ that enable others to have more [[thoughts/agency]]: agency to ask questions without judgement; agency to do what they are intrinsically drawn toward; agency to [[thoughts/play|play]] (because what's the point if we can't have a bit of fun?).
+- **[The atoms of a model](/posts/tokens-the-atoms-of-llms)** — watch your words dissolve into [[thoughts/token|tokens]].
+- **[Embeddings, explained](/posts/embeddings-explained)** — where meaning becomes distance on a map.
+- **[How a transformer thinks](/posts/how-a-transformer-thinks)** — click a word and see [[thoughts/attention|attention]] light up.
+- **[Temperature and the next word](/posts/temperature-and-sampling)** — load the model's dice and watch it get weird.
+- **[Watch a model learn](/posts/watch-a-model-learn)** — roll the ball downhill; that's training.
 
-As far as 'about' pages go, I hope this acts as an open invitation into the many winding paths throughout this garden. Here are some places you may want to visit:
-
-- [The oak letter desk](/posts/): a collection of my favourite [[thoughts/writing|writing]];
-- [The hand-crafted workbench](thoughts/craft.md): craft I am proud of (websites, talks, workshops, projects, etc.);
-- [The bookshelf on the far wall](/books): books that are in some state of read, being read, or to be read.
+Prefer to wander? The [[thoughts/llm|concept notes]] are a linked encyclopedia of AI terms — start anywhere and follow the threads, or open the graph view.
 
 ```poetry
-- Oliveaniss :)
+- Oliveaniss
 ```

@@ -54,6 +54,7 @@ export const sharedPageComponents: SharedLayout = {
     }),
     ...recentNotes.map((c) => Component.MobileOnly(c)),
     Component.Pwa(),
+    Component.Explorables(),
   ],
   footer: Component.Footer({
     links: {
