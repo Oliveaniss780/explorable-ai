@@ -312,3 +312,54 @@
     display: none;
   }
 }
+
+// ── garden map (semantic scatter of every note) ──────────────────────────────
+.gmap-svg {
+  overflow: visible;
+}
+
+.gmap-node {
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  & a {
+    background-color: transparent;
+    text-decoration: none;
+  }
+
+  & .gmap-label {
+    font-family: var(--bodyFont);
+    font-size: 10px;
+    fill: var(--gray);
+    opacity: 0.5; // legible at a glance; emphasised on hover
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+  }
+
+  & circle {
+    transition:
+      r 0.15s ease,
+      fill 0.15s ease;
+  }
+
+  &:hover .gmap-label,
+  &:focus .gmap-label,
+  &.active .gmap-label {
+    opacity: 1;
+    fill: var(--dark);
+    font-weight: 600;
+  }
+
+  &.active circle {
+    r: 7;
+    fill: var(--tertiary);
+  }
+
+  &.dim {
+    opacity: 0.25;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}

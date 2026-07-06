@@ -24,6 +24,10 @@ Or **ask the garden** — type a question and an embedding model running _in you
 
 Prefer to wander? The [[thoughts/llm|concept notes]] are a linked encyclopedia of AI terms — start anywhere and follow the threads, or open the graph view.
 
+Or explore the whole garden **by meaning**. The graph view links notes that _reference_ each other; this map places every note by what it's _about_ — a mini dimensionality-reduction of the garden itself. Hover a dot to see its closest kin; click to open it.
+
+<div class="explorable" data-explorable="garden-map"></div>
+
 ```poetry
 - Oliveaniss
 ```

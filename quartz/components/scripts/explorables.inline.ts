@@ -523,6 +523,197 @@ function mountLlm(el: HTMLElement) {
   })
 }
 
+// ── 8. Garden map ────────────────────────────────────────────────────────────
+// A 2-D map of every note positioned by *meaning*, not links: TF-IDF vectors
+// reduced to 2 dimensions with classical MDS / PCA, entirely in the browser.
+// Hover a note to see its nearest neighbours; click to open it.
+const STOP = new Set(
+  "the a an and or but of to in on for with as is are was were be been being it its this that these those by at from into out over under again then once here there all any both each few more most other some such no nor not only own same so than too very can will just don should now i you he she they we me my your his her their our what which who whom whose when where why how".split(
+    " ",
+  ),
+)
+
+function mountGardenMap(el: HTMLElement) {
+  const status = caption("Mapping the garden by meaning…")
+  const holder = document.createElement("div")
+  holder.className = "gmap-holder"
+  el.append(holder, status)
+
+  fetch("/static/contentIndex.json")
+    .then((r) => r.json())
+    .then((idx: Record<string, any>) => {
+      const docs = Object.entries(idx)
+        .filter(([slug, d]) => d && d.content && d.title && !slug.startsWith("tags/"))
+        .map(([slug, d]) => ({ slug, title: d.title as string, text: `${d.title} ${d.content}` }))
+      const N = docs.length
+      if (N < 4) {
+        status.textContent = "Not enough notes to map yet."
+        return
+      }
+
+      // ── TF-IDF (terms kept if they appear in ≥2 notes) ──
+      const tokenize = (t: string) =>
+        (t.toLowerCase().match(/[a-z][a-z'-]{2,}/g) || []).filter((w) => !STOP.has(w))
+      const tf = docs.map((d) => {
+        const m = new Map<string, number>()
+        for (const w of tokenize(d.text)) m.set(w, (m.get(w) || 0) + 1)
+        return m
+      })
+      const df = new Map<string, number>()
+      tf.forEach((m) => m.forEach((_, w) => df.set(w, (df.get(w) || 0) + 1)))
+      const vecs = tf.map((m) => {
+        const v = new Map<string, number>()
+        let norm = 0
+        m.forEach((c, w) => {
+          const d = df.get(w) || 1
+          if (d < 2) return
+          const val = (1 + Math.log(c)) * Math.log((N + 1) / (d + 1))
+          v.set(w, val)
+          norm += val * val
+        })
+        norm = Math.sqrt(norm) || 1
+        v.forEach((val, w) => v.set(w, val / norm))
+        return v
+      })
+      const dot = (a: Map<string, number>, b: Map<string, number>) => {
+        let s = 0
+        const [small, big] = a.size < b.size ? [a, b] : [b, a]
+        small.forEach((val, w) => {
+          const o = big.get(w)
+          if (o) s += val * o
+        })
+        return s
+      }
+
+      // ── Gram (cosine sim) → double-centre → top-2 eigenvectors (PCA/MDS) ──
+      const G: Float64Array[] = Array.from({ length: N }, () => new Float64Array(N))
+      for (let i = 0; i < N; i++)
+        for (let j = i; j < N; j++) {
+          const s = i === j ? 1 : dot(vecs[i], vecs[j])
+          G[i][j] = s
+          G[j][i] = s
+        }
+      const sim = G.map((r) => Float64Array.from(r)) // keep raw similarities for neighbours
+      const rowMean = new Float64Array(N)
+      let total = 0
+      for (let i = 0; i < N; i++) {
+        let s = 0
+        for (let j = 0; j < N; j++) s += G[i][j]
+        rowMean[i] = s / N
+        total += s
+      }
+      total /= N * N
+      const B: Float64Array[] = Array.from({ length: N }, () => new Float64Array(N))
+      for (let i = 0; i < N; i++)
+        for (let j = 0; j < N; j++) B[i][j] = G[i][j] - rowMean[i] - rowMean[j] + total
+
+      const mul = (M: Float64Array[], v: Float64Array) => {
+        const out = new Float64Array(N)
+        for (let i = 0; i < N; i++) {
+          let s = 0
+          for (let j = 0; j < N; j++) s += M[i][j] * v[j]
+          out[i] = s
+        }
+        return out
+      }
+      const norm = (v: Float64Array) => {
+        let s = 0
+        for (const x of v) s += x * x
+        s = Math.sqrt(s) || 1
+        for (let i = 0; i < N; i++) v[i] /= s
+        return v
+      }
+      const powerIter = (M: Float64Array[]) => {
+        let v = norm(Float64Array.from({ length: N }, (_, i) => Math.sin(i * 1.7 + 0.5)))
+        for (let k = 0; k < 120; k++) v = norm(mul(M, v))
+        const mv = mul(M, v)
+        let lam = 0
+        for (let i = 0; i < N; i++) lam += v[i] * mv[i]
+        return { v, lam }
+      }
+      const e1 = powerIter(B)
+      // deflate, then second component
+      for (let i = 0; i < N; i++)
+        for (let j = 0; j < N; j++) B[i][j] -= e1.lam * e1.v[i] * e1.v[j]
+      const e2 = powerIter(B)
+
+      const xs = e1.v.map((x) => x * Math.sqrt(Math.abs(e1.lam)))
+      const ys = e2.v.map((y) => y * Math.sqrt(Math.abs(e2.lam)))
+      const nz = (a: number[]) => {
+        const lo = Math.min(...a)
+        const hi = Math.max(...a)
+        const span = hi - lo || 1
+        return a.map((v) => (v - lo) / span)
+      }
+      const nx = nz(xs)
+      const ny = nz(ys)
+
+      // ── render SVG scatter ──
+      const W = 560
+      const H = 380
+      const pad = 26
+      const px = (x: number) => pad + x * (W - 2 * pad)
+      const py = (y: number) => pad + y * (H - 2 * pad)
+      const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, class: "explorable-svg gmap-svg" })
+      const linkLayer = svgEl("g")
+      svg.appendChild(linkLayer)
+
+      const nodes = docs.map((d, i) => {
+        const g = svgEl("g", { class: "gmap-node", tabindex: 0 })
+        const a = svgEl("a", { href: "/" + d.slug })
+        const dot = svgEl("circle", { cx: px(nx[i]), cy: py(ny[i]), r: 5, fill: cssVar("--secondary") })
+        const label = svgEl("text", { x: px(nx[i]) + 9, y: py(ny[i]) + 4, class: "gmap-label" })
+        label.textContent = d.title.length > 26 ? d.title.slice(0, 25) + "…" : d.title
+        a.append(dot, label)
+        g.appendChild(a)
+        svg.appendChild(g)
+        return { g, i }
+      })
+
+      const clear = () => {
+        linkLayer.innerHTML = ""
+        nodes.forEach((n) => n.g.classList.remove("dim", "active"))
+      }
+      const focus = (i: number) => {
+        clear()
+        const near = Array.from(sim[i])
+          .map((s, j) => ({ j, s }))
+          .filter((o) => o.j !== i)
+          .sort((a, b) => b.s - a.s)
+          .slice(0, 3)
+        nodes.forEach((n) => n.g.classList.add("dim"))
+        nodes[i].g.classList.remove("dim")
+        nodes[i].g.classList.add("active")
+        near.forEach(({ j }) => {
+          nodes[j].g.classList.remove("dim")
+          linkLayer.appendChild(
+            svgEl("line", {
+              x1: px(nx[i]),
+              y1: py(ny[i]),
+              x2: px(nx[j]),
+              y2: py(ny[j]),
+              stroke: cssVar("--tertiary"),
+              "stroke-width": 1.4,
+              "stroke-dasharray": "3 3",
+            }),
+          )
+        })
+      }
+      nodes.forEach((n) => {
+        n.g.addEventListener("mouseenter", () => focus(n.i))
+        n.g.addEventListener("focus", () => focus(n.i))
+        n.g.addEventListener("mouseleave", clear)
+      })
+
+      holder.appendChild(svg)
+      status.textContent =
+        "Every note placed by meaning — nearby dots share topics. Hover to see a note's closest neighbours; click to open it."
+    })
+    .catch(() => {
+      status.textContent = "Couldn't build the map (is the site running?)."
+    })
+}
+
 const REGISTRY: Record<string, (el: HTMLElement) => void> = {
   tokenizer: mountTokenizer,
   embeddings: mountEmbeddings,
@@ -531,6 +722,7 @@ const REGISTRY: Record<string, (el: HTMLElement) => void> = {
   "gradient-descent": mountGradientDescent,
   ask: mountAsk,
   llm: mountLlm,
+  "garden-map": mountGardenMap,
 }
 
 function mountExplorables() {
