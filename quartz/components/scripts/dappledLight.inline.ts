@@ -498,7 +498,9 @@ function initScene(container: HTMLElement) {
   let colB = cssVar("--komorebi-shadow")
   let chartRGB = rgbStr("--secondary")
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  const SCALE = 2
+  // render at the display's native resolution (capped) so the scene is crisp
+  // rather than the old half-res, nearest-neighbor-upscaled look
+  const dpr = Math.min(window.devicePixelRatio || 1, 2)
 
   let w = 600
   let h = 180
@@ -506,8 +508,8 @@ function initScene(container: HTMLElement) {
   let bh = 60
   const resize = () => {
     ;[w, h] = contentSize(container)
-    bw = Math.max(1, Math.round(w / SCALE))
-    bh = Math.max(1, Math.round(h / SCALE))
+    bw = Math.max(1, Math.round(w * dpr))
+    bh = Math.max(1, Math.round(h * dpr))
     canvas.width = bw
     canvas.height = bh
     canvas.style.width = w + "px"
