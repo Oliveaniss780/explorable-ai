@@ -2,10 +2,17 @@ import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } fro
 import style from "./styles/footer.scss"
 import { version } from "../../package.json"
 import { i18n } from "../i18n"
+import { SimpleSlug, resolveRelative } from "../util/path"
 
 interface Options {
   links: Record<string, string>
 }
+
+const aboutLinks: { title: string; dest: SimpleSlug }[] = [
+  { title: "Now", dest: "now" as SimpleSlug },
+  { title: "Uses", dest: "uses" as SimpleSlug },
+  { title: "Colophon", dest: "colophon" as SimpleSlug },
+]
 
 // Brand glyphs (single-path, simple-icons style) keyed by the lowercased link
 // label so social links can render as icons instead of text.
@@ -36,7 +43,7 @@ function SocialIcon({ name }: { name: string }) {
 }
 
 export default ((opts?: Options) => {
-  const Footer: QuartzComponent = ({ displayClass, cfg }: QuartzComponentProps) => {
+  const Footer: QuartzComponent = ({ displayClass, cfg, fileData }: QuartzComponentProps) => {
     const year = new Date().getFullYear()
     const links = opts?.links ?? []
     return (
@@ -44,6 +51,17 @@ export default ((opts?: Options) => {
         <div class="footer-rule" aria-hidden="true">
           ❧
         </div>
+        <nav class="footer-links" aria-label="About">
+          <ul>
+            {aboutLinks.map(({ title, dest }) => (
+              <li>
+                <a class="internal" href={resolveRelative(fileData.slug!, dest)}>
+                  {title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <div class="footer-bottom">
           <p class="footer-meta">
             {i18n(cfg.locale).components.footer.createdWith} Quartz v{version} © {year}

@@ -1,6 +1,14 @@
 import { PageLayout, SharedLayout } from "./quartz/cfg"
 import * as Component from "./quartz/components"
 import { SimpleSlug } from "./quartz/util/path"
+import { QuartzComponentProps } from "./quartz/components/types"
+
+// true for real single articles (a note under posts/ or thoughts/), not the
+// section index / tag / folder listing pages
+const isArticle = (props: QuartzComponentProps) => {
+  const slug = props.fileData.slug ?? ""
+  return (slug.startsWith("posts/") || slug.startsWith("thoughts/")) && !slug.endsWith("index")
+}
 
 const recentNotes = [
   Component.RecentNotes({
@@ -25,7 +33,28 @@ const recentNotes = [
 export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
   header: [Component.Navbar()],
-  afterBody: [...recentNotes.map((c) => Component.MobileOnly(c))],
+  afterBody: [
+    // share + subscribe + comments live at the end of real articles only
+    Component.ConditionalRender({ component: Component.ShareButtons(), condition: isArticle }),
+    Component.ConditionalRender({ component: Component.Newsletter(), condition: isArticle }),
+    Component.ConditionalRender({
+      component: Component.Comments({
+        provider: "giscus",
+        options: {
+          // ⚠️ Replace with your own giscus repo values (https://giscus.app),
+          // then add `comments: true` to a note's frontmatter to enable it.
+          repo: "Oliveaniss/oliveaniss",
+          repoId: "",
+          category: "General",
+          categoryId: "",
+        },
+      }),
+      // gated on frontmatter so no broken giscus box renders until configured
+      condition: (props) => isArticle(props) && props.fileData.frontmatter?.comments === true,
+    }),
+    ...recentNotes.map((c) => Component.MobileOnly(c)),
+    Component.Pwa(),
+  ],
   footer: Component.Footer({
     links: {
       GitHub: "https://github.com/Oliveaniss",
@@ -56,7 +85,11 @@ export const defaultContentPageLayout: PageLayout = {
     Component.TagList(),
   ],
   left,
-  right: [Component.DesktopOnly(Component.TableOfContents()), Component.Backlinks()],
+  right: [
+    Component.DesktopOnly(Component.TableOfContents()),
+    Component.Backlinks(),
+    Component.Graph(),
+  ],
 }
 
 // components for pages that display lists of pages  (e.g. tags or folders)

@@ -26,6 +26,8 @@ export default (() => {
     const path = url.pathname as FullSlug
     const baseDir = fileData.slug === "404" ? path : pathToRoot(fileData.slug!)
     const iconPath = joinSegments(baseDir, "static/icon.png")
+    const appleIconPath = joinSegments(baseDir, "static/icon-192.png")
+    const manifestPath = joinSegments(baseDir, "static/manifest.webmanifest")
     const fontStylePath = joinSegments(baseDir, "static/font/font-style.css")
 
     // Url of current page
@@ -84,6 +86,13 @@ export default (() => {
         )}
 
         <link rel="icon" href={iconPath} />
+        {/* PWA: installable web app manifest + platform theming */}
+        <link rel="manifest" href={manifestPath} />
+        <link rel="apple-touch-icon" href={appleIconPath} />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content={cfg.pageTitle} />
+        <meta name="theme-color" content="#f5eedd" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#06182f" media="(prefers-color-scheme: dark)" />
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
         <link href={fontStylePath} rel="stylesheet" type="text/css" spa-preserve />

@@ -1,0 +1,68 @@
+@use "../../styles/variables.scss" as *;
+
+.newsletter {
+  margin: 2.5rem 0;
+  padding: 1.5rem;
+  border: 1px solid var(--lightgray);
+  background-color: color-mix(in srgb, var(--secondary) 5%, transparent);
+
+  & .newsletter-title {
+    margin: 0 0 0.35rem;
+    font-family: var(--headerFont);
+    font-size: 1.35rem;
+    color: var(--dark);
+  }
+
+  & .newsletter-blurb {
+    margin: 0 0 1.1rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+    max-width: 42ch;
+  }
+
+  & .newsletter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+
+    & input[type="email"] {
+      flex: 1 1 16rem;
+      min-width: 0;
+      padding: 0.6rem 0.8rem;
+      font-family: var(--bodyFont);
+      font-size: 0.9rem;
+      color: var(--dark);
+      background-color: var(--light);
+      border: 1px solid var(--lightgray);
+      border-radius: 0;
+
+      &::placeholder {
+        color: var(--gray);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--secondary);
+      }
+    }
+
+    & button {
+      flex: 0 0 auto;
+      padding: 0.6rem 1.3rem;
+      font-family: var(--bodyFont);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--light);
+      background-color: var(--tertiary);
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: color-mix(in srgb, var(--tertiary) 85%, black);
+      }
+    }
+  }
+}

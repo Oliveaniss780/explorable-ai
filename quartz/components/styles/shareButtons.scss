@@ -1,0 +1,76 @@
+@use "../../styles/variables.scss" as *;
+
+.share-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 2.5rem 0 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--lightgray);
+
+  & .share-label {
+    font-family: var(--bodyFont);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  & ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  & li {
+    margin: 0;
+    padding: 0;
+  }
+
+  & a,
+  & button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--gray);
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    & svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+    }
+
+    &:hover {
+      color: var(--tertiary);
+    }
+  }
+
+  // copied-state feedback: swap the link icon for a check-like accent
+  & .share-copy.copied {
+    color: var(--tertiary);
+    position: relative;
+
+    &::after {
+      content: "copied";
+      position: absolute;
+      left: 50%;
+      top: -1.4rem;
+      transform: translateX(-50%);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--tertiary);
+      white-space: nowrap;
+    }
+  }
+}

@@ -25,6 +25,9 @@ import Flex from "./Flex"
 import ConditionalRender from "./ConditionalRender"
 import ReadingEnhancements from "./ReadingEnhancements"
 import Navbar from "./Navbar"
+import ShareButtons from "./ShareButtons"
+import Newsletter from "./Newsletter"
+import Pwa from "./Pwa"
 
 export {
   ArticleTitle,
@@ -54,4 +57,7 @@ export {
   ConditionalRender,
   ReadingEnhancements,
   Navbar,
+  ShareButtons,
+  Newsletter,
+  Pwa,
 }

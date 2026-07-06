@@ -38,6 +38,41 @@ footer {
     }
   }
 
+  // small "about" links row (Now / Uses / Colophon)
+  & .footer-links {
+    margin-bottom: 1.25rem;
+
+    & ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1.2rem;
+    }
+
+    & li {
+      margin: 0;
+      padding: 0;
+    }
+
+    & a {
+      background-color: transparent;
+      text-decoration: none;
+      font-family: var(--bodyFont);
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray);
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: var(--tertiary);
+      }
+    }
+  }
+
   // meta text on the left, social icons pinned to the right, on one baseline row
   & .footer-bottom {
     display: flex;

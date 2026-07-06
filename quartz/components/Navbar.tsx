@@ -21,6 +21,7 @@ const defaultLinks: NavLink[] = [
   { title: "Thoughts", dest: "thoughts/" as SimpleSlug, match: "thoughts" },
   { title: "Books", dest: "books" as SimpleSlug, match: "books" },
   { title: "Tags", dest: "tags/" as SimpleSlug, match: "tags" },
+  { title: "Now", dest: "now" as SimpleSlug, match: "now" },
 ]
 
 export default ((opts?: Options) => {
