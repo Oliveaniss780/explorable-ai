@@ -36,6 +36,19 @@
         background-color: var(--lightgray);
       }
     }
+
+    // fill the box so the canvas is sized to the full 400px height and the
+    // node cluster sits centred, not stuck in the top 250px
+    & > .graph-container {
+      width: 100%;
+      height: 100%;
+
+      & > canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
 
   & > .global-graph-outer {
