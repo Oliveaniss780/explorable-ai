@@ -1,0 +1,104 @@
+@use "../../styles/variables.scss" as *;
+
+// ─── Reading progress: a thin "second-ink" (vermilion) rule at the top of the
+// viewport that fills as you scroll. Pure CSS scroll-driven animation — no JS,
+// no scroll listener. Degrades to an invisible bar where unsupported.
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  height: 3px;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background-color: var(--tertiary);
+  pointer-events: none;
+
+  @supports (animation-timeline: scroll()) {
+    animation: reading-progress-grow linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    display: none;
+  }
+}
+
+@keyframes reading-progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+// ─── Sidenotes ─────────────────────────────────────────────────────────────
+// The <aside.sidenote> nodes are injected next to each footnote reference.
+// Default (tablet / mobile): hidden — the native bottom footnotes section is
+// kept instead. Desktop: floated into a reserved right-hand gutter, Tufte-style.
+aside.sidenote {
+  display: none;
+}
+
+// Sidenotes need real horizontal room. The center column reaches its full
+// ~750px only once the page hits its 1400px max, so we gate the margin layout
+// there — below it, prose stays full width and the native bottom footnotes are
+// kept, so the article never looks like a stray narrow column.
+@media all and (min-width: 1400px) {
+  // reserve the right gutter by narrowing the running prose; figures, code,
+  // tables and the decorative scene stay full-width for impact
+  article.has-sidenotes {
+    & > p,
+    & > ul,
+    & > ol,
+    & > blockquote,
+    & > h1,
+    & > h2,
+    & > h3,
+    & > h4,
+    & > h5,
+    & > h6,
+    & > dl {
+      max-width: 30rem;
+    }
+
+    // the bottom footnotes list is redundant once notes live in the margin
+    & > section[data-footnotes],
+    & > section.footnotes {
+      display: none;
+    }
+  }
+
+  aside.sidenote {
+    display: block;
+    float: right;
+    clear: right;
+    width: 13rem;
+    margin-right: -14.5rem;
+    margin-top: 0.15rem;
+    margin-bottom: 1rem;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--gray);
+    text-align: left;
+    text-wrap: pretty;
+
+    & > .sidenote-marker {
+      color: var(--tertiary);
+      font-weight: 600;
+      margin-right: 0.3rem;
+    }
+
+    // footnote bodies are wrapped in <p>; flatten spacing
+    p {
+      display: inline;
+      margin: 0;
+    }
+
+    a {
+      font-size: inherit;
+    }
+  }
+}

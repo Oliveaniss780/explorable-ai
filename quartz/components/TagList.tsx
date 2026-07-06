@@ -1,0 +1,64 @@
+import { FullSlug, resolveRelative } from "../util/path"
+import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
+import { classNames } from "../util/lang"
+
+const TagList: QuartzComponent = ({ fileData, displayClass }: QuartzComponentProps) => {
+  const tags = fileData.frontmatter?.tags
+  if (tags && tags.length > 0) {
+    return (
+      <ul class={classNames(displayClass, "tags")}>
+        {tags.map((tag) => {
+          const linkDest = resolveRelative(fileData.slug!, `tags/${tag}` as FullSlug)
+          return (
+            <li>
+              <a href={linkDest} class="internal tag-link">
+                {tag}
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    )
+  } else {
+    return null
+  }
+}
+
+TagList.css = `
+.tags {
+  list-style: none;
+  display:flex;
+  padding-left: 0;
+  gap: 0.4rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.section-li > .section > .tags {
+  justify-content: flex-end;
+}
+  
+.tags > li {
+  display: inline-block;
+  white-space: nowrap;
+  margin: 0;
+  overflow-wrap: normal;
+}
+
+a.internal.tag-link {
+  border-radius: 0;
+  /* vermilion "second ink" chips: red text on a faint red wash */
+  color: var(--tertiary);
+  background-color: color-mix(in srgb, var(--tertiary) 12%, transparent);
+  padding: 0.2rem 0.4rem;
+  margin: 0 0.1rem;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+a.internal.tag-link:hover {
+  color: var(--tertiary);
+  background-color: color-mix(in srgb, var(--tertiary) 20%, transparent);
+}
+`
+
+export default (() => TagList) satisfies QuartzComponentConstructor

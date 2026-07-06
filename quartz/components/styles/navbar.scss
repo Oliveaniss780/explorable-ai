@@ -1,0 +1,78 @@
+@use "../../styles/variables.scss" as *;
+
+// Letterpress-style primary nav: a row of small-caps labels over a thin hairline
+// rule, with a vermilion "second-ink" underline marking the active section.
+.navbar {
+  width: 100%;
+
+  & > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0.6rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 1.4rem;
+    border-bottom: 1px solid var(--lightgray);
+  }
+
+  & li {
+    margin: 0;
+    padding: 0;
+  }
+
+  & a {
+    // reset the article-link underline styling; nav gets its own treatment
+    background-color: transparent;
+    text-decoration: none;
+    font-family: var(--bodyFont);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gray);
+    position: relative;
+    padding-bottom: 0.15rem;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--dark);
+    }
+
+    // animated vermilion underline that grows from the left
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -0.62rem; // sit on the hairline rule
+      height: 2px;
+      width: 100%;
+      background-color: var(--tertiary);
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover::after {
+      transform: scaleX(1);
+    }
+
+    &.active {
+      color: var(--dark);
+
+      &::after {
+        transform: scaleX(1);
+      }
+    }
+  }
+
+  @media all and ($mobile) {
+    & > ul {
+      gap: 1rem;
+    }
+    & a {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+    }
+  }
+}

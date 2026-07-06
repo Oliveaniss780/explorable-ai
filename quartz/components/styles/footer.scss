@@ -1,0 +1,107 @@
+@use "../../styles/variables.scss" as *;
+
+footer {
+  text-align: left;
+  padding: 2rem 0 4rem;
+  margin-top: 3rem;
+
+  // ── decorative floral scene-break (aldus leaf) in the vermilion second ink ──
+  & .footer-rule {
+    position: relative;
+    text-align: center;
+    margin: 0 0 2rem;
+    line-height: 1;
+    // hide the literal glyph in the markup; the ::after supplies the visible one
+    font-size: 0;
+
+    // hairline that the leaf glyph sits on top of
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: var(--lightgray);
+    }
+
+    // the ❧ glyph, boxed out of the line with page-colored padding
+    &::after {
+      content: "❧";
+      position: relative;
+      display: inline-block;
+      padding: 0 0.9rem;
+      background-color: var(--light);
+      color: var(--tertiary);
+      font-family: var(--headerFont);
+      font-size: 1.4rem;
+    }
+  }
+
+  // meta text on the left, social icons pinned to the right, on one baseline row
+  & .footer-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+  }
+
+  & .footer-social {
+    margin-left: auto;
+
+    & ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1.1rem;
+    }
+
+    & li {
+      margin: 0;
+      padding: 0;
+    }
+
+    & a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: transparent;
+      color: var(--gray);
+      transition: color 0.15s ease;
+
+      & svg {
+        display: block;
+        width: 20px;
+        height: 20px;
+      }
+
+      &:hover {
+        color: var(--tertiary);
+      }
+    }
+  }
+
+  & .footer-meta {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--gray);
+    opacity: 0.85;
+
+    & a {
+      color: var(--gray);
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+
+      &:hover {
+        color: var(--tertiary);
+      }
+    }
+  }
+}
