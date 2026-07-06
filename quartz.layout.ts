@@ -34,6 +34,8 @@ export const sharedPageComponents: SharedLayout = {
   head: Component.Head(),
   header: [Component.Navbar()],
   afterBody: [
+    // the guided-path rail renders itself only on posts in the series
+    Component.SeriesNav(),
     // share + subscribe + comments live at the end of real articles only
     Component.ConditionalRender({ component: Component.ShareButtons(), condition: isArticle }),
     Component.ConditionalRender({ component: Component.Newsletter(), condition: isArticle }),

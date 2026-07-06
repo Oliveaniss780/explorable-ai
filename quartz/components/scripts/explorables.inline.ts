@@ -21,6 +21,8 @@ function caption(text: string) {
 }
 
 // ── 1. Tokenizer ────────────────────────────────────────────────────────────
+// Starts with a cheap approximation, then lazy-loads the real GPT-4 byte-pair
+// tokenizer (cl100k_base) from a CDN and switches to exact tokens once ready.
 function mountTokenizer(el: HTMLElement) {
   const input = document.createElement("textarea")
   input.className = "explorable-input"
@@ -29,8 +31,10 @@ function mountTokenizer(el: HTMLElement) {
 
   const out = document.createElement("div")
   out.className = "token-chips"
+  const note = caption("")
 
-  const tokenize = (text: string): string[] => {
+  // fallback used until (or if) the real tokenizer loads
+  const approx = (text: string): string[] => {
     const pieces = text.match(/[A-Za-z]+|[0-9]+|[^\sA-Za-z0-9]/g) || []
     const toks: string[] = []
     for (const p of pieces) {
@@ -43,22 +47,47 @@ function mountTokenizer(el: HTMLElement) {
     return toks
   }
 
-  const note = caption("")
+  let realTokenize: ((t: string) => string[]) | null = null
+  let status = "loading the real GPT-4 tokenizer…"
+
   const render = () => {
     out.innerHTML = ""
-    const toks = tokenize(input.value)
+    let toks: string[]
+    let label: string
+    if (realTokenize) {
+      toks = realTokenize(input.value)
+      label = `${toks.length} tokens — real byte-pair encoding (cl100k_base, the GPT-4 tokenizer). “·” marks a leading space.`
+    } else {
+      toks = approx(input.value)
+      label = `${toks.length} tokens — approximate; ${status}`
+    }
     toks.forEach((t, i) => {
       const chip = document.createElement("span")
       chip.className = "token-chip"
       chip.style.setProperty("--i", String(i % 6))
-      chip.textContent = t
+      chip.textContent = t.replace(/ /g, "·").replace(/\n/g, "⏎")
       out.appendChild(chip)
     })
-    note.textContent = `${toks.length} tokens — a simplified view; real byte-pair tokenizers merge differently.`
+    note.textContent = label
   }
   input.addEventListener("input", render)
   el.append(input, out, note)
   render()
+
+  // hide the dynamic import from the bundler so it stays a runtime CDN fetch
+  const dynImport = new Function("u", "return import(u)") as (u: string) => Promise<any>
+  dynImport("https://esm.sh/gpt-tokenizer@2.9.0")
+    .then((mod: any) => {
+      const encode = mod.encode ?? mod.default?.encode
+      const decode = mod.decode ?? mod.default?.decode
+      if (!encode || !decode) throw new Error("no encode/decode")
+      realTokenize = (text: string) => (text ? encode(text).map((id: number) => decode([id])) : [])
+      render()
+    })
+    .catch(() => {
+      status = "real tokenizer unavailable (offline?); showing an approximation."
+      render()
+    })
 }
 
 // ── 2. Embeddings map ───────────────────────────────────────────────────────
