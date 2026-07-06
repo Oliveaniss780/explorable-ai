@@ -350,9 +350,11 @@
     font-weight: 600;
   }
 
+  // keep the note's tag colour on hover; emphasise with size + a ring
   &.active circle {
     r: 7;
-    fill: var(--tertiary);
+    stroke: var(--dark);
+    stroke-width: 1.5;
   }
 
   &.dim {
@@ -362,4 +364,27 @@
   &:focus {
     outline: none;
   }
+}
+
+.gmap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-top: 0.75rem;
+}
+
+.gmap-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--gray);
+}
+
+.gmap-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 auto;
 }

@@ -544,7 +544,12 @@ function mountGardenMap(el: HTMLElement) {
     .then((idx: Record<string, any>) => {
       const docs = Object.entries(idx)
         .filter(([slug, d]) => d && d.content && d.title && !slug.startsWith("tags/"))
-        .map(([slug, d]) => ({ slug, title: d.title as string, text: `${d.title} ${d.content}` }))
+        .map(([slug, d]) => ({
+          slug,
+          title: d.title as string,
+          text: `${d.title} ${d.content}`,
+          tags: (d.tags || []) as string[],
+        }))
       const N = docs.length
       if (N < 4) {
         status.textContent = "Not enough notes to map yet."
@@ -648,6 +653,22 @@ function mountGardenMap(el: HTMLElement) {
       const nx = nz(xs)
       const ny = nz(ys)
 
+      // ── colour by primary tag (skip ubiquitous / garden-maturity tags) ──
+      const GENERIC = new Set(["seed", "sapling", "evergreen", "explorable"])
+      const primary = docs.map(
+        (d) => d.tags.find((t) => !GENERIC.has(t)) || d.tags[0] || "misc",
+      )
+      const freq = new Map<string, number>()
+      primary.forEach((t) => freq.set(t, (freq.get(t) || 0) + 1))
+      const tagsOrdered = Array.from(freq.entries())
+        .sort((a, b) => b[1] - a[1])
+        .map((e) => e[0])
+      // muted earth-tone palette — distinct but harmonious in light + dark
+      const PALETTE = ["#c17d4a", "#8c6a48", "#a5563a", "#7e8248", "#5f8079", "#946a86", "#b58a3c", "#7a6a55"]
+      const tagColor = new Map<string, string>()
+      tagsOrdered.forEach((t, i) => tagColor.set(t, PALETTE[i % PALETTE.length]))
+      const colorOf = (i: number) => tagColor.get(primary[i]) || cssVar("--secondary")
+
       // ── render SVG scatter ──
       const W = 560
       const H = 380
@@ -661,7 +682,7 @@ function mountGardenMap(el: HTMLElement) {
       const nodes = docs.map((d, i) => {
         const g = svgEl("g", { class: "gmap-node", tabindex: 0 })
         const a = svgEl("a", { href: "/" + d.slug })
-        const dot = svgEl("circle", { cx: px(nx[i]), cy: py(ny[i]), r: 5, fill: cssVar("--secondary") })
+        const dot = svgEl("circle", { cx: px(nx[i]), cy: py(ny[i]), r: 5, fill: colorOf(i) })
         const label = svgEl("text", { x: px(nx[i]) + 9, y: py(ny[i]) + 4, class: "gmap-label" })
         label.textContent = d.title.length > 26 ? d.title.slice(0, 25) + "…" : d.title
         a.append(dot, label)
@@ -706,8 +727,25 @@ function mountGardenMap(el: HTMLElement) {
       })
 
       holder.appendChild(svg)
+
+      // colour legend
+      const legend = document.createElement("div")
+      legend.className = "gmap-legend"
+      tagsOrdered.forEach((t) => {
+        const item = document.createElement("span")
+        item.className = "gmap-legend-item"
+        const sw = document.createElement("span")
+        sw.className = "gmap-legend-swatch"
+        sw.style.backgroundColor = tagColor.get(t)!
+        const lab = document.createElement("span")
+        lab.textContent = t
+        item.append(sw, lab)
+        legend.appendChild(item)
+      })
+      holder.appendChild(legend)
+
       status.textContent =
-        "Every note placed by meaning — nearby dots share topics. Hover to see a note's closest neighbours; click to open it."
+        "Every note placed by meaning and coloured by topic — nearby dots share themes. Hover to see a note's closest neighbours; click to open it."
     })
     .catch(() => {
       status.textContent = "Couldn't build the map (is the site running?)."
