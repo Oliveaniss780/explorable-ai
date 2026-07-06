@@ -22,7 +22,8 @@
       "Bash(git commit -q -m ' *)",
       "Bash(rm -f /tmp/tok.png /tmp/g*.png)",
       "Bash(cd *)",
-      "Skill(claude-api)"
+      "Skill(claude-api)",
+      "Bash(rm -f /tmp/brown-*.png)"
     ]
   }
 }

@@ -387,19 +387,19 @@ body.animation-ready #quartz-body {
 // komorebi 3-tone palette: deep shadow -> warm gold light -> bright wall.
 // Theme-aware so both modes read well (warm gold on navy/prussian).
 :root {
-  --komorebi-shadow: #233452;
-  --komorebi-mid: #e89a39; // warm amber-orange rim
-  --komorebi-light: #f5eedd;
+  --komorebi-shadow: #5a4632; // warm brown dapple shadow
+  --komorebi-mid: #d8963f; // warm amber rim
+  --komorebi-light: #f4ede1; // oat-milk wall
   --komorebi-frame: var(--komorebi-shadow); // frame = the dark ink in light mode
   --komorebi-gap: var(--komorebi-light); // padding gap fill
   --komorebi-center: 0.38; // tonal balance: light wall w/ dark dapples
 }
-// nighttime: moonlit wall (light blue) with dark tree shadows, cool glow
+// nighttime: warm lamplit wall (soft caramel) with deep cacao tree shadows
 [saved-theme="dark"] {
-  --komorebi-shadow: #0c2038; // tree shadow / unlit wall (deep night blue)
-  --komorebi-mid: #6a86b0; // soft penumbra at shadow edges — dimmer than the wall
-  --komorebi-light: #83a1c9; // moonlit wall — the main light color (light blue)
-  --komorebi-frame: var(--komorebi-light); // frame = the moonlight color at night
+  --komorebi-shadow: #1c140d; // tree shadow / unlit wall (deep cacao)
+  --komorebi-mid: #a97b4a; // soft penumbra at shadow edges — dimmer than the wall
+  --komorebi-light: #c79a68; // lamplit wall — the main light color (warm caramel)
+  --komorebi-frame: var(--komorebi-light); // frame = the lamplight color at night
   --komorebi-gap: var(--komorebi-shadow); // padding gap fill (dark at night)
   --komorebi-center: 0.38;
 }

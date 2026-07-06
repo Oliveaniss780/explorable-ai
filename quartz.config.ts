@@ -31,29 +31,29 @@ const config: QuartzConfig = {
         code: "JetBrains Mono",
       },
       colors: {
-        // letterpress poster: deep navy + vermilion on warm paper
+        // soft-brown "latte" palette: warm mocha ink + caramel accents on oat paper
         lightMode: {
-          light: "#f5eedd", // warm letterpress paper
-          lightgray: "#e3d9c0", // aged paper borders / code bg
-          gray: "#9a8e76", // muted warm gray (dates, line numbers)
-          darkgray: "#2d4673", // navy ink body text (reads clearly blue, not black)
-          dark: "#16294e", // deep navy headings
-          secondary: "#284d78", // navy links / title / primary accent
-          tertiary: "#c8482b", // bright orange-red (hover, active, graph)
-          highlight: "rgba(200, 72, 43, 0.1)", // faint vermilion ink wash
-          textHighlight: "#f4c84b88", // warm yellow marker
+          light: "#f4ede1", // warm oat-milk background
+          lightgray: "#e7dcc9", // light tan borders / code bg
+          gray: "#a1917b", // muted taupe (dates, line numbers)
+          darkgray: "#4d4137", // soft dark-brown body text
+          dark: "#2f2620", // deep espresso headings
+          secondary: "#8c6a48", // caramel/mocha links / title / primary accent
+          tertiary: "#c17d4a", // warm amber (hover, active, graph)
+          highlight: "rgba(193, 125, 74, 0.1)", // faint amber wash
+          textHighlight: "#e3b87a88", // soft amber marker
         },
-        // cyanotype: warm cream + vermilion accent on deep prussian blue
+        // dark cacao: warm cream + amber accents on deep espresso
         darkMode: {
-          light: "#06182f", // deep prussian blue background
-          lightgray: "#122845", // lighter prussian borders / code bg
-          gray: "#7191b8", // muted steel-blue (dates, line numbers)
-          darkgray: "#caddf4", // cyanotype light-blue body text
-          dark: "#eef4fc", // bright blue-white (headings)
-          secondary: "#8fb9de", // luminous sky-cyan links / title
-          tertiary: "#e0552f", // bold vermilion (hover, active, graph)
-          highlight: "rgba(224, 85, 47, 0.14)", // faint vermilion wash
-          textHighlight: "#c9542f55", // muted vermilion marker
+          light: "#241c15", // deep espresso background (soft, not black)
+          lightgray: "#33291f", // lighter cacao borders / code bg
+          gray: "#9a8975", // muted warm taupe (dates, line numbers)
+          darkgray: "#e5d7c3", // warm cream body text
+          dark: "#f5ecdd", // bright cream headings
+          secondary: "#d3a877", // soft caramel links / title
+          tertiary: "#e0975a", // warm amber (hover, active, graph)
+          highlight: "rgba(224, 151, 90, 0.14)", // faint amber wash
+          textHighlight: "#c1824a55", // muted amber marker
         },
       },
     },

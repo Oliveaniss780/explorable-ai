@@ -91,8 +91,8 @@ export default (() => {
         <link rel="apple-touch-icon" href={appleIconPath} />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content={cfg.pageTitle} />
-        <meta name="theme-color" content="#f5eedd" media="(prefers-color-scheme: light)" />
-        <meta name="theme-color" content="#06182f" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#f4ede1" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#241c15" media="(prefers-color-scheme: dark)" />
         <meta name="description" content={description} />
         <meta name="generator" content="Quartz" />
         <link href={fontStylePath} rel="stylesheet" type="text/css" spa-preserve />
