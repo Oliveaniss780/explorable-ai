@@ -24,7 +24,9 @@
       "Bash(cd *)",
       "Skill(claude-api)",
       "Bash(rm -f /tmp/brown-*.png)",
-      "Bash(rm -f /tmp/nh-*.png)"
+      "Bash(rm -f /tmp/nh-*.png)",
+      "Bash(rm -f /tmp/komo*.png /tmp/cherr.txt)",
+      "Bash(rm -rf /tmp/cp2-* /tmp/cprofile-*)"
     ]
   }
 }
