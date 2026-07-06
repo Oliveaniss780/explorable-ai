@@ -361,12 +361,176 @@ function mountGradientDescent(el: HTMLElement) {
   window.addCleanup(() => cancelAnimationFrame(raf))
 }
 
+// ── 6. Ask the garden (semantic search / live RAG) ──────────────────────────
+// Embeds every note and the query with a MiniLM model running in the browser,
+// then ranks by cosine similarity. A real, working retrieval demo.
+function mountAsk(el: HTMLElement) {
+  const form = document.createElement("form")
+  form.className = "ask-form"
+  const input = document.createElement("input")
+  input.type = "search"
+  input.className = "ask-input"
+  input.placeholder = "Ask about anything in the garden…"
+  const btn = document.createElement("button")
+  btn.type = "submit"
+  btn.className = "explorable-btn"
+  btn.textContent = "Ask"
+  form.append(input, btn)
+
+  const status = caption(
+    "Semantic search over every note — the query and all notes are embedded by a model running in your browser, then ranked by meaning.",
+  )
+  const results = document.createElement("div")
+  results.className = "ask-results"
+  el.append(form, status, results)
+
+  let embedder: any = null
+  let notes: { slug: string; title: string; desc: string; vec: number[] }[] | null = null
+  let ready = false
+  let loading = false
+
+  const embed = async (text: string): Promise<number[]> => {
+    const out = await embedder(text, { pooling: "mean", normalize: true })
+    return Array.from(out.data as Float32Array)
+  }
+  const cos = (a: number[], b: number[]) => {
+    let s = 0
+    for (let i = 0; i < a.length; i++) s += a[i] * b[i]
+    return s
+  }
+
+  const ensureReady = async (): Promise<boolean> => {
+    if (ready) return true
+    if (loading) return false
+    loading = true
+    btn.disabled = true
+    try {
+      status.textContent = "Loading the embedding model (~20 MB, first time only)…"
+      const dynImport = new Function("u", "return import(u)") as (u: string) => Promise<any>
+      const t = await dynImport("https://esm.sh/@xenova/transformers@2.17.2")
+      embedder = await t.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2")
+      const idx = await fetch("/static/contentIndex.json").then((r) => r.json())
+      const entries = Object.entries<any>(idx).filter(
+        ([slug, d]) => d && d.content && slug !== "" && !slug.startsWith("tags/"),
+      )
+      notes = []
+      let i = 0
+      for (const [slug, d] of entries) {
+        status.textContent = `Embedding notes… ${++i}/${entries.length}`
+        const vec = await embed(`${d.title}. ${(d.content || "").slice(0, 1200)}`)
+        notes.push({ slug, title: d.title || slug, desc: (d.content || "").slice(0, 150), vec })
+      }
+      ready = true
+      status.textContent = "Ready — ask a question and I'll surface the closest notes by meaning."
+      return true
+    } catch {
+      status.textContent =
+        "Semantic search couldn't load (offline?). Use the ⌘K keyword search instead."
+      loading = false
+      return false
+    } finally {
+      btn.disabled = false
+    }
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault()
+    const q = input.value.trim()
+    if (!q) return
+    if (!(await ensureReady()) || !notes) return
+    status.textContent = "Searching…"
+    const qv = await embed(q)
+    const ranked = notes
+      .map((n) => ({ n, s: cos(qv, n.vec) }))
+      .sort((a, b) => b.s - a.s)
+      .slice(0, 5)
+    results.innerHTML = ""
+    ranked.forEach(({ n, s }) => {
+      const a = document.createElement("a")
+      a.className = "ask-result internal"
+      a.href = "/" + n.slug
+      const title = document.createElement("span")
+      title.className = "ask-result-title"
+      title.textContent = n.title
+      const score = document.createElement("span")
+      score.className = "ask-score"
+      score.textContent = `${(s * 100).toFixed(0)}%`
+      const desc = document.createElement("span")
+      desc.className = "ask-result-desc"
+      desc.textContent = n.desc + "…"
+      a.append(title, score, desc)
+      results.appendChild(a)
+    })
+    status.textContent = `Top matches for “${q}”, by semantic similarity.`
+  })
+}
+
+// ── 7. Live LLM playground ──────────────────────────────────────────────────
+// Talks to a real model through a small proxy you deploy (see serverless/
+// llm-proxy.js). The endpoint is read from data-endpoint; without it, the
+// widget explains how to wire one up instead of silently failing.
+function mountLlm(el: HTMLElement) {
+  const endpoint = el.dataset.endpoint || (window as any).__LLM_ENDPOINT || ""
+
+  if (!endpoint) {
+    const setup = document.createElement("div")
+    setup.className = "llm-setup"
+    setup.innerHTML =
+      "<strong>Live model — needs a 30-second setup.</strong> This widget calls a real Claude model through a tiny proxy that keeps your API key server-side. " +
+      "Deploy <code>serverless/llm-proxy.js</code> (a Cloudflare Worker) with your <code>ANTHROPIC_API_KEY</code>, then set the widget's endpoint: " +
+      '<code>&lt;div class="explorable" data-explorable="llm" data-endpoint="https://your-worker.workers.dev"&gt;&lt;/div&gt;</code>'
+    el.appendChild(setup)
+    return
+  }
+
+  const form = document.createElement("form")
+  form.className = "llm-form"
+  const input = document.createElement("textarea")
+  input.className = "explorable-input"
+  input.rows = 3
+  input.value = el.dataset.text || "Explain attention in one sentence."
+  const btn = document.createElement("button")
+  btn.type = "submit"
+  btn.className = "explorable-btn"
+  btn.textContent = "Generate"
+  form.append(input, btn)
+
+  const out = document.createElement("div")
+  out.className = "llm-output"
+  const note = caption("A real model responds. Output is generated, so it varies and can be wrong.")
+  el.append(form, out, note)
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault()
+    const prompt = input.value.trim()
+    if (!prompt) return
+    btn.disabled = true
+    out.textContent = "Thinking…"
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      })
+      const ct = res.headers.get("content-type") || ""
+      const text = ct.includes("application/json") ? (await res.json()).text ?? "" : await res.text()
+      out.textContent = text || "(no output)"
+    } catch {
+      out.textContent = "Request failed — check the endpoint and its CORS settings."
+    } finally {
+      btn.disabled = false
+    }
+  })
+}
+
 const REGISTRY: Record<string, (el: HTMLElement) => void> = {
   tokenizer: mountTokenizer,
   embeddings: mountEmbeddings,
   attention: mountAttention,
   temperature: mountTemperature,
   "gradient-descent": mountGradientDescent,
+  ask: mountAsk,
+  llm: mountLlm,
 }
 
 function mountExplorables() {

@@ -18,6 +18,10 @@ Start with the five that build on each other:
 - **[Temperature and the next word](/posts/temperature-and-sampling)** — load the model's dice and watch it get weird.
 - **[Watch a model learn](/posts/watch-a-model-learn)** — roll the ball downhill; that's training.
 
+Or **ask the garden** — type a question and an embedding model running _in your browser_ finds the notes closest in meaning (a live [[thoughts/rag|RAG]] demo):
+
+<div class="explorable" data-explorable="ask"></div>
+
 Prefer to wander? The [[thoughts/llm|concept notes]] are a linked encyclopedia of AI terms — start anywhere and follow the threads, or open the graph view.
 
 ```poetry
