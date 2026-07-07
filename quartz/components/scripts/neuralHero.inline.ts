@@ -1,48 +1,80 @@
-// Home-page hero: a living neural network. Layered nodes with pulses of
-// activation that propagate left → right, like signal flowing through a model.
-// Canvas-only, driven by the site's theme CSS variables so it recolours with
-// light/dark mode. Replaces the old komorebi scene. Re-inits on SPA nav.
+// Home-page hero: an "attention" animation. A short sentence sits along the
+// bottom; glowing arcs sweep from token to token — the way a transformer
+// attends across words — while the focused word pulses. Sentences cycle.
+// Canvas-only, themed via the site's CSS variables, paused when off-screen.
 
-interface Node {
-  x: number
-  y: number
-  act: number // 0..1 activation glow
+const cssVar = (name: string) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#888"
+const hexToRgb = (hex: string): [number, number, number] => {
+  const h = hex.replace("#", "")
+  const v =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h.slice(0, 6)
+  const n = parseInt(v || "888888", 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
 }
-interface Signal {
-  l: number // source layer
-  i: number // source node index
-  j: number // target node index (in layer l+1)
-  t: number // 0..1 progress along the edge
-  speed: number
+const rgba = (hex: string, a: number) => {
+  const [r, g, b] = hexToRgb(hex)
+  return `rgba(${r},${g},${b},${a})`
 }
 
-function initNeural(el: HTMLElement) {
+const SENTENCES = [
+  ["Explorable", "AI,", "one", "idea", "you", "can", "touch"],
+  ["Attention", "is", "all", "you", "need"],
+  ["Every", "word", "attends", "to", "the", "others"],
+  ["Meaning", "becomes", "distance", "in", "space"],
+]
+
+// deterministic pseudo-embedding so the "attention" weights respond to the words
+function vec(w: string): number[] {
+  let s = 2166136261
+  for (let i = 0; i < w.length; i++) {
+    s ^= w.charCodeAt(i)
+    s = Math.imul(s, 16777619)
+  }
+  const v: number[] = []
+  let n = 0
+  for (let i = 0; i < 6; i++) {
+    s = (s * 1664525 + 1013904223) >>> 0
+    const x = (s / 4294967296) * 2 - 1
+    v.push(x)
+    n += x * x
+  }
+  n = Math.sqrt(n) || 1
+  return v.map((x) => x / n)
+}
+function attention(tokens: string[]): number[][] {
+  const vs = tokens.map(vec)
+  return tokens.map((_, i) => {
+    const logits = tokens.map((__, j) => {
+      const sim = i === j ? 0.6 : vs[i].reduce((a, x, k) => a + x * vs[j][k], 0)
+      return Math.exp(sim * 3)
+    })
+    const sum = logits.reduce((a, b) => a + b, 0)
+    return logits.map((l) => l / sum)
+  })
+}
+
+function initHero(el: HTMLElement) {
   const canvas = document.createElement("canvas")
   canvas.className = "neural-canvas"
   el.appendChild(canvas)
   const ctx = canvas.getContext("2d")!
 
-  const LAYERS = [4, 7, 7, 3]
   let W = 0
   let H = 0
   let dpr = 1
-  let nodes: Node[][] = []
-
-  const cssVar = (n: string) =>
-    getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#888"
-  // parse "#rrggbb" -> [r,g,b] for alpha compositing
-  const rgb = (hex: string): [number, number, number] => {
-    const h = hex.replace("#", "")
-    const v =
-      h.length === 3
-        ? h
-            .split("")
-            .map((c) => c + c)
-            .join("")
-        : h.slice(0, 6)
-    const n = parseInt(v || "888888", 16)
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
-  }
+  let sentIdx = 0
+  let tokens = SENTENCES[0]
+  let att = attention(tokens)
+  let xs: number[] = []
+  let baseY = 0
+  let fontSize = 26
+  const font = () => `600 ${fontSize}px "Bricolage Grotesque", system-ui, sans-serif`
 
   const layout = () => {
     const rect = el.getBoundingClientRect()
@@ -54,128 +86,120 @@ function initNeural(el: HTMLElement) {
     canvas.style.width = W + "px"
     canvas.style.height = H + "px"
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-
-    const padX = W * 0.12
-    const padY = H * 0.16
-    nodes = LAYERS.map((count, l) => {
-      const x = padX + (l / (LAYERS.length - 1)) * (W - 2 * padX)
-      return Array.from({ length: count }, (_, i) => {
-        const y = count === 1 ? H / 2 : padY + (i / (count - 1)) * (H - 2 * padY)
-        return { x, y, act: 0 }
-      })
+    fontSize = Math.max(17, Math.min(30, H * 0.13))
+    baseY = H * 0.72
+    ctx.font = font()
+    const gap = fontSize * 0.7
+    const widths = tokens.map((t) => ctx.measureText(t).width)
+    const total = widths.reduce((a, b) => a + b, 0) + gap * (tokens.length - 1)
+    let x = (W - total) / 2
+    xs = tokens.map((_, i) => {
+      const cx = x + widths[i] / 2
+      x += widths[i] + gap
+      return cx
     })
   }
 
-  const signals: Signal[] = []
-  const rand = (a: number, b: number) => a + (b - a) * fakeRandom()
-  // deterministic-ish jitter without Math.random (which is unavailable in some
-  // build contexts); a lightweight LCG seeded from a mutable counter
-  let seed = 1
-  function fakeRandom() {
-    seed = (seed * 1664525 + 1013904223) % 4294967296
-    return seed / 4294967296
-  }
-
-  const spawnFrom = (l: number, i: number) => {
-    const next = nodes[l + 1]
-    if (!next) return
-    const fanout = 1 + Math.floor(fakeRandom() * 2) // 1..2
-    for (let k = 0; k < fanout; k++) {
-      const j = Math.floor(fakeRandom() * next.length)
-      signals.push({ l, i, j, t: 0, speed: rand(0.7, 1.3) })
-    }
-  }
-
-  let injectTimer = 0
-  const step = (dt: number) => {
-    for (const layer of nodes) for (const n of layer) n.act *= Math.pow(0.9, dt * 60)
-
-    for (let s = signals.length - 1; s >= 0; s--) {
-      const sig = signals[s]
-      sig.t += sig.speed * dt
-      if (sig.t >= 1) {
-        const target = nodes[sig.l + 1]?.[sig.j]
-        if (target) target.act = 1
-        if (sig.l + 1 < nodes.length - 1) spawnFrom(sig.l + 1, sig.j)
-        signals.splice(s, 1)
-      }
-    }
-
-    injectTimer -= dt
-    if (injectTimer <= 0) {
-      injectTimer = rand(0.35, 0.8)
-      const i = Math.floor(fakeRandom() * nodes[0].length)
-      nodes[0][i].act = 1
-      spawnFrom(0, i)
-    }
-  }
+  const BEAT = 1.5 // seconds a word holds the "focus"
+  const CYCLES = 2 // sweeps of the sentence before it changes
+  let t = 0
+  let fade = 0 // fade-in after a sentence change
+  const easeIO = (x: number) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2)
 
   const draw = () => {
-    const cLight = cssVar("--light")
-    const [gr, gg, gb] = rgb(cssVar("--gray"))
-    const [sr, sg, sb] = rgb(cssVar("--secondary"))
-    const [tr, tg, tb] = rgb(cssVar("--tertiary"))
-
+    const light = cssVar("--light")
+    const ter = cssVar("--tertiary")
+    const gray = hexToRgb(cssVar("--gray"))
+    const dark = hexToRgb(cssVar("--dark"))
     ctx.clearRect(0, 0, W, H)
-    ctx.fillStyle = cLight
+    ctx.fillStyle = light
     ctx.fillRect(0, 0, W, H)
 
-    // faint edges between every adjacent pair
-    ctx.lineWidth = 1
-    ctx.strokeStyle = `rgba(${gr},${gg},${gb},0.14)`
-    for (let l = 0; l < nodes.length - 1; l++) {
-      for (const a of nodes[l]) {
-        for (const b of nodes[l + 1]) {
-          ctx.beginPath()
-          ctx.moveTo(a.x, a.y)
-          ctx.lineTo(b.x, b.y)
-          ctx.stroke()
-        }
+    const n = tokens.length
+    const beat = t / BEAT
+    const idx = Math.floor(beat) % n
+    const nextIdx = (idx + 1) % n
+    const local = beat % 1
+    const cross = easeIO(Math.max(0, (local - 0.72) / 0.28))
+    const wCur = 1 - cross
+    const wNext = cross
+    const anchorY = baseY - fontSize * 0.72
+
+    ctx.globalAlpha = 1 - fade
+
+    const drawArcs = (q: number, w: number) => {
+      if (w <= 0.01) return
+      const qx = xs[q]
+      for (let j = 0; j < n; j++) {
+        if (j === q) continue
+        const a = att[q][j] * w
+        if (a < 0.02) continue
+        const jx = xs[j]
+        const mx = (qx + jx) / 2
+        const my = Math.max(8, anchorY - (Math.abs(qx - jx) * 0.35 + 26))
+        ctx.beginPath()
+        ctx.moveTo(qx, anchorY)
+        ctx.quadraticCurveTo(mx, my, jx, anchorY)
+        ctx.strokeStyle = rgba(ter, Math.min(0.9, a * 1.5))
+        ctx.lineWidth = 1 + a * 3.5
+        ctx.stroke()
       }
     }
+    drawArcs(idx, wCur)
+    drawArcs(nextIdx, wNext)
 
-    // travelling signals: a bright amber head + short glow
-    for (const sig of signals) {
-      const a = nodes[sig.l][sig.i]
-      const b = nodes[sig.l + 1]?.[sig.j]
-      if (!b) continue
-      const x = a.x + (b.x - a.x) * sig.t
-      const y = a.y + (b.y - a.y) * sig.t
-      // energized segment behind the head
-      const grad = ctx.createLinearGradient(a.x, a.y, x, y)
-      grad.addColorStop(0, `rgba(${tr},${tg},${tb},0)`)
-      grad.addColorStop(1, `rgba(${tr},${tg},${tb},0.6)`)
-      ctx.strokeStyle = grad
-      ctx.lineWidth = 1.6
+    // a particle riding the strongest arc of the focused word
+    let best = -1
+    let bv = -1
+    for (let j = 0; j < n; j++) if (j !== idx && att[idx][j] > bv) ((bv = att[idx][j]), (best = j))
+    if (best >= 0) {
+      const qx = xs[idx]
+      const jx = xs[best]
+      const mx = (qx + jx) / 2
+      const my = Math.max(8, anchorY - (Math.abs(qx - jx) * 0.35 + 26))
+      const p = (t * 0.7) % 1
+      const ix = (1 - p) * (1 - p) * qx + 2 * (1 - p) * p * mx + p * p * jx
+      const iy = (1 - p) * (1 - p) * anchorY + 2 * (1 - p) * p * my + p * p * anchorY
+      ctx.fillStyle = rgba(ter, 0.95)
       ctx.beginPath()
-      ctx.moveTo(a.x, a.y)
-      ctx.lineTo(x, y)
-      ctx.stroke()
-      // head
-      ctx.fillStyle = `rgba(${tr},${tg},${tb},0.95)`
-      ctx.beginPath()
-      ctx.arc(x, y, 2.6, 0, Math.PI * 2)
+      ctx.arc(ix, iy, 3, 0, Math.PI * 2)
       ctx.fill()
     }
 
-    // nodes: base ring in secondary, glow blends toward tertiary with activation
-    for (const layer of nodes) {
-      for (const n of layer) {
-        const a = n.act
-        if (a > 0.02) {
-          ctx.fillStyle = `rgba(${tr},${tg},${tb},${0.22 * a})`
-          ctx.beginPath()
-          ctx.arc(n.x, n.y, 10 + 6 * a, 0, Math.PI * 2)
-          ctx.fill()
-        }
-        const r = Math.round(sr + (tr - sr) * a)
-        const g = Math.round(sg + (tg - sg) * a)
-        const bl = Math.round(sb + (tb - sb) * a)
-        ctx.fillStyle = `rgb(${r},${g},${bl})`
+    // tokens
+    ctx.font = font()
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+    tokens.forEach((tok, i) => {
+      const recv = i === idx ? 1 : att[idx][i] * wCur + att[nextIdx][i] * wNext
+      const mix = Math.min(1, recv * 1.7)
+      if (i === idx) {
+        ctx.fillStyle = rgba(ter, 0.16)
         ctx.beginPath()
-        ctx.arc(n.x, n.y, 4 + 1.5 * a, 0, Math.PI * 2)
+        ctx.arc(xs[i], baseY, fontSize * 0.95, 0, Math.PI * 2)
         ctx.fill()
+        ctx.fillStyle = ter
+      } else {
+        const r = Math.round(gray[0] + (dark[0] - gray[0]) * mix)
+        const g = Math.round(gray[1] + (dark[1] - gray[1]) * mix)
+        const b = Math.round(gray[2] + (dark[2] - gray[2]) * mix)
+        ctx.fillStyle = `rgb(${r},${g},${b})`
       }
+      ctx.fillText(tok, xs[i], baseY)
+    })
+    ctx.globalAlpha = 1
+  }
+
+  const step = (dt: number) => {
+    t += dt
+    if (fade > 0) fade = Math.max(0, fade - dt / 0.5)
+    if (Math.floor(t / BEAT / tokens.length) >= CYCLES) {
+      sentIdx = (sentIdx + 1) % SENTENCES.length
+      tokens = SENTENCES[sentIdx]
+      att = attention(tokens)
+      t = 0
+      fade = 1
+      layout()
     }
   }
 
@@ -190,15 +214,13 @@ function initNeural(el: HTMLElement) {
     draw()
     raf = requestAnimationFrame(frame)
   }
-
   layout()
   raf = requestAnimationFrame(frame)
 
   const onResize = () => layout()
   window.addEventListener("resize", onResize)
 
-  // run only when the tab is visible AND the hero is on-screen — otherwise the
-  // canvas keeps animating while scrolled far below the fold
+  // run only when the tab is visible AND the hero is on-screen
   let onScreen = true
   const sync = () => {
     const shouldRun = document.visibilityState === "visible" && onScreen
@@ -236,5 +258,5 @@ document.addEventListener("nav", () => {
   const el = document.querySelector(".neural-hero") as HTMLElement | null
   if (!el || el.dataset.init === "true") return
   el.dataset.init = "true"
-  initNeural(el)
+  initHero(el)
 })
