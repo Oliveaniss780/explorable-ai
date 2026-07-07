@@ -35,7 +35,8 @@
       "Bash(rm -f /tmp/cal*.png)",
       "Bash(curl -s -o /dev/null -w \"home: HTTP %{http_code}\\\\n\" http://localhost:8080/)",
       "Bash(curl -s -o /dev/null -w \"teach-a-neuron: HTTP %{http_code}\\\\n\" http://localhost:8080/posts/teach-a-neuron)",
-      "Bash(curl -s -o /dev/null -w \"localhost: HTTP %{http_code}\\\\n\" http://localhost:8080/)"
+      "Bash(curl -s -o /dev/null -w \"localhost: HTTP %{http_code}\\\\n\" http://localhost:8080/)",
+      "Bash(rm -f /tmp/rain-*.png)"
     ]
   }
 }
