@@ -75,6 +75,21 @@ function initHero(el: HTMLElement) {
   let baseY = 0
   let fontSize = 26
   const font = () => `600 ${fontSize}px "Bricolage Grotesque", system-ui, sans-serif`
+  const TAU = Math.PI * 2
+  const bez = (tt: number, a: number, b: number, c: number) =>
+    (1 - tt) * (1 - tt) * a + 2 * (1 - tt) * tt * b + tt * tt * c
+  // faint drifting motes for depth
+  let dust: { x: number; y: number; vx: number; vy: number; r: number; a: number }[] = []
+  const seedDust = () => {
+    dust = Array.from({ length: 22 }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6,
+      r: 0.6 + Math.random() * 1.6,
+      a: 0.05 + Math.random() * 0.12,
+    }))
+  }
 
   const layout = () => {
     const rect = el.getBoundingClientRect()
@@ -98,6 +113,7 @@ function initHero(el: HTMLElement) {
       x += widths[i] + gap
       return cx
     })
+    if (!dust.length) seedDust()
   }
 
   const BEAT = 1.5 // seconds a word holds the "focus"
@@ -109,11 +125,20 @@ function initHero(el: HTMLElement) {
   const draw = () => {
     const light = cssVar("--light")
     const ter = cssVar("--tertiary")
+    const sec = cssVar("--secondary")
     const gray = hexToRgb(cssVar("--gray"))
     const dark = hexToRgb(cssVar("--dark"))
     ctx.clearRect(0, 0, W, H)
     ctx.fillStyle = light
     ctx.fillRect(0, 0, W, H)
+
+    // drifting dust for depth
+    for (const d of dust) {
+      ctx.fillStyle = rgba(ter, d.a)
+      ctx.beginPath()
+      ctx.arc(d.x, d.y, d.r, 0, TAU)
+      ctx.fill()
+    }
 
     const n = tokens.length
     const beat = t / BEAT
@@ -124,9 +149,13 @@ function initHero(el: HTMLElement) {
     const wCur = 1 - cross
     const wNext = cross
     const anchorY = baseY - fontSize * 0.72
+    const arcMid = (qx: number, jx: number) =>
+      Math.max(8, anchorY - (Math.abs(qx - jx) * 0.35 + 26))
 
     ctx.globalAlpha = 1 - fade
+    ctx.lineCap = "round"
 
+    // arcs: a soft wide glow pass + a thin gradient core
     const drawArcs = (q: number, w: number) => {
       if (w <= 0.01) return
       const qx = xs[q]
@@ -136,56 +165,76 @@ function initHero(el: HTMLElement) {
         if (a < 0.02) continue
         const jx = xs[j]
         const mx = (qx + jx) / 2
-        const my = Math.max(8, anchorY - (Math.abs(qx - jx) * 0.35 + 26))
+        const my = arcMid(qx, jx)
         ctx.beginPath()
         ctx.moveTo(qx, anchorY)
         ctx.quadraticCurveTo(mx, my, jx, anchorY)
-        ctx.strokeStyle = rgba(ter, Math.min(0.9, a * 1.5))
-        ctx.lineWidth = 1 + a * 3.5
+        // glow
+        ctx.strokeStyle = rgba(ter, Math.min(0.28, a * 0.5))
+        ctx.lineWidth = 3 + a * 6
+        ctx.stroke()
+        // gradient core (bright at the focus, fading toward the target)
+        const grad = ctx.createLinearGradient(qx, anchorY, jx, anchorY)
+        grad.addColorStop(0, rgba(ter, Math.min(0.95, a * 1.9)))
+        grad.addColorStop(1, rgba(sec, Math.min(0.45, a * 0.9)))
+        ctx.strokeStyle = grad
+        ctx.lineWidth = 1 + a * 2.5
         ctx.stroke()
       }
     }
     drawArcs(idx, wCur)
     drawArcs(nextIdx, wNext)
 
-    // a particle riding the strongest arc of the focused word
-    let best = -1
-    let bv = -1
-    for (let j = 0; j < n; j++) if (j !== idx && att[idx][j] > bv) ((bv = att[idx][j]), (best = j))
-    if (best >= 0) {
-      const qx = xs[idx]
-      const jx = xs[best]
+    // particles with short trails on the focus word's strongest arcs
+    const targets = [...Array(n).keys()]
+      .filter((j) => j !== idx)
+      .sort((a, b) => att[idx][b] - att[idx][a])
+      .slice(0, 3)
+    const qx = xs[idx]
+    targets.forEach((j, k) => {
+      const jx = xs[j]
       const mx = (qx + jx) / 2
-      const my = Math.max(8, anchorY - (Math.abs(qx - jx) * 0.35 + 26))
-      const p = (t * 0.7) % 1
-      const ix = (1 - p) * (1 - p) * qx + 2 * (1 - p) * p * mx + p * p * jx
-      const iy = (1 - p) * (1 - p) * anchorY + 2 * (1 - p) * p * my + p * p * anchorY
-      ctx.fillStyle = rgba(ter, 0.95)
-      ctx.beginPath()
-      ctx.arc(ix, iy, 3, 0, Math.PI * 2)
-      ctx.fill()
-    }
+      const my = arcMid(qx, jx)
+      const base = (t * 0.6 + k * 0.33) % 1
+      for (let s = 0; s < 4; s++) {
+        const pp = base - s * 0.05
+        if (pp < 0) continue
+        const ix = bez(pp, qx, mx, jx)
+        const iy = bez(pp, anchorY, my, anchorY)
+        ctx.fillStyle = rgba(ter, (0.9 - s * 0.22) * wCur)
+        ctx.beginPath()
+        ctx.arc(ix, iy, Math.max(0.6, 3 - s * 0.6), 0, TAU)
+        ctx.fill()
+      }
+    })
 
-    // tokens
+    // tokens with a breathing radial glow on the focused word
+    const pulse = 0.9 + 0.12 * Math.sin(t * 3)
     ctx.font = font()
     ctx.textAlign = "center"
     ctx.textBaseline = "middle"
     tokens.forEach((tok, i) => {
       const recv = i === idx ? 1 : att[idx][i] * wCur + att[nextIdx][i] * wNext
       const mix = Math.min(1, recv * 1.7)
+      let color: string
       if (i === idx) {
-        ctx.fillStyle = rgba(ter, 0.16)
+        const rad = fontSize * 1.5 * pulse
+        const g = ctx.createRadialGradient(xs[i], baseY, 2, xs[i], baseY, rad)
+        g.addColorStop(0, rgba(ter, 0.3))
+        g.addColorStop(1, rgba(ter, 0))
+        ctx.fillStyle = g
         ctx.beginPath()
-        ctx.arc(xs[i], baseY, fontSize * 0.95, 0, Math.PI * 2)
+        ctx.arc(xs[i], baseY, rad, 0, TAU)
         ctx.fill()
-        ctx.fillStyle = ter
+        color = ter
       } else {
         const r = Math.round(gray[0] + (dark[0] - gray[0]) * mix)
         const g = Math.round(gray[1] + (dark[1] - gray[1]) * mix)
         const b = Math.round(gray[2] + (dark[2] - gray[2]) * mix)
-        ctx.fillStyle = `rgb(${r},${g},${b})`
+        color = `rgb(${r},${g},${b})`
       }
-      ctx.fillText(tok, xs[i], baseY)
+      ctx.fillStyle = color
+      ctx.fillText(tok, xs[i], baseY - (i === idx ? 2 : 0))
     })
     ctx.globalAlpha = 1
   }
@@ -193,6 +242,14 @@ function initHero(el: HTMLElement) {
   const step = (dt: number) => {
     t += dt
     if (fade > 0) fade = Math.max(0, fade - dt / 0.5)
+    for (const d of dust) {
+      d.x += d.vx * dt
+      d.y += d.vy * dt
+      if (d.x < 0) d.x += W
+      else if (d.x > W) d.x -= W
+      if (d.y < 0) d.y += H
+      else if (d.y > H) d.y -= H
+    }
     if (Math.floor(t / BEAT / tokens.length) >= CYCLES) {
       sentIdx = (sentIdx + 1) % SENTENCES.length
       tokens = SENTENCES[sentIdx]
