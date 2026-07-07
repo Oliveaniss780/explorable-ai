@@ -1,7 +1,5 @@
 import { QuartzComponent, QuartzComponentConstructor, QuartzComponentProps } from "./types"
 import style from "./styles/footer.scss"
-import { version } from "../../package.json"
-import { i18n } from "../i18n"
 import { SimpleSlug, resolveRelative } from "../util/path"
 
 interface Options {
@@ -43,7 +41,7 @@ function SocialIcon({ name }: { name: string }) {
 }
 
 export default ((opts?: Options) => {
-  const Footer: QuartzComponent = ({ displayClass, cfg, fileData }: QuartzComponentProps) => {
+  const Footer: QuartzComponent = ({ displayClass, fileData }: QuartzComponentProps) => {
     const year = new Date().getFullYear()
     const links = opts?.links ?? []
     return (
@@ -63,9 +61,7 @@ export default ((opts?: Options) => {
           </ul>
         </nav>
         <div class="footer-bottom">
-          <p class="footer-meta">
-            {i18n(cfg.locale).components.footer.createdWith} Quartz v{version} © {year}
-          </p>
+          <p class="footer-meta">© {year} Oliveaniss · Explorable AI</p>
           {Object.keys(links).length > 0 && (
             <nav class="footer-social" aria-label="Elsewhere">
               <ul>
