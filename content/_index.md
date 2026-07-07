@@ -30,6 +30,10 @@ Or explore the whole garden **by meaning**. The graph view links notes that _ref
 
 <div class="explorable" data-explorable="garden-map"></div>
 
+And here's the garden being tended — my commits over the last year, pulled live from GitHub:
+
+<div class="explorable" data-explorable="commits" data-user="Oliveaniss780"></div>
+
 ```poetry
 - Oliveaniss
 ```
