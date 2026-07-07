@@ -15,10 +15,4 @@ _This is a [now page](https://nownownow.com/about) — a snapshot of what I'm fo
 - Chasing the question: _what's the simplest interactive demo that makes an AI idea click?_
 - Reading widely across ML papers and trying to translate the good ones into a five-minute widget.
 
-## Tending activity
-
-Commits to the garden and everything around it — pulled live from GitHub.
-
-<div class="explorable" data-explorable="commits" data-user="Oliveaniss780"></div>
-
 > Have an AI concept you wish someone would make _explorable_? Tell me — the links are in the footer.
