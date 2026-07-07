@@ -29,3 +29,9 @@ Tokens are the unit of almost everything downstream:
 - **Weird failure modes** — models struggle to count letters or reverse strings precisely because they see tokens, not characters.
 
 Once text is tokens, each token becomes a vector — an **[[thoughts/embedding|embedding]]** — and the real thinking begins. That's the next explorable: [[posts/embeddings-explained|Embeddings, explained]].
+
+## Make a card
+
+Type any sentence and share how a model would tokenize it — a small, oddly satisfying window into how AI reads.
+
+<div class="explorable" data-explorable="tokenize-card" data-text="attention is all you need"></div>

@@ -18,6 +18,8 @@ Start with the five that build on each other:
 - **[Temperature and the next word](/posts/temperature-and-sampling)** — load the model's dice and watch it get weird.
 - **[Watch a model learn](/posts/watch-a-model-learn)** — roll the ball downhill; that's training.
 
+Want the big picture first? **[See the whole model on one screen](/posts/the-whole-model)** — every stage lit up at once — or **[teach a neuron](/posts/teach-a-neuron)** by drawing your own data.
+
 Or **ask the garden** — type a question and an embedding model running _in your browser_ finds the notes closest in meaning (a live [[thoughts/rag|RAG]] demo):
 
 <div class="explorable" data-explorable="ask"></div>

@@ -388,3 +388,154 @@
   display: inline-block;
   flex: 0 0 auto;
 }
+
+// visited notes glow — the reader's trail through the garden
+.gmap-node.visited circle {
+  stroke: var(--tertiary);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--tertiary) 70%, transparent));
+}
+
+// ── whole-model pipeline ─────────────────────────────────────────────────────
+.pipe-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.pipe-stage {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--lightgray);
+  border-left: 3px solid var(--lightgray);
+  background-color: var(--light);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+
+  &.lit {
+    border-left-color: var(--tertiary);
+    background-color: color-mix(in srgb, var(--tertiary) 7%, var(--light));
+  }
+}
+
+.pipe-stage-h {
+  font-family: var(--bodyFont);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 0.5rem;
+}
+
+.pipe-stage-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.emb-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.emb-row-lab {
+  flex: 0 0 3.5rem;
+  font-family: var(--codeFont, monospace);
+  font-size: 0.72rem;
+  color: var(--darkgray);
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emb-cell {
+  flex: 1 1 auto;
+  height: 14px;
+  min-width: 10px;
+  border-radius: 2px;
+  background-color: var(--lightgray);
+}
+
+.attn-grid {
+  display: grid;
+  gap: 2px;
+  align-items: center;
+  width: 100%;
+}
+
+.attn-grid .attn-h {
+  font-family: var(--codeFont, monospace);
+  font-size: 0.62rem;
+  color: var(--gray);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attn-grid .attn-rl {
+  text-align: right;
+  padding-right: 3px;
+}
+
+.attn-cell {
+  height: 22px;
+  border-radius: 2px;
+  background-color: color-mix(in srgb, var(--gray) 12%, transparent);
+}
+
+// ── teach a neuron / share card controls ─────────────────────────────────────
+.learn-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.9rem;
+}
+
+.learn-cls {
+  padding: 0.35rem 0.8rem;
+  font-family: var(--bodyFont);
+  font-size: 0.78rem;
+  border: 1px solid var(--lightgray);
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 0;
+  color: var(--gray);
+
+  &:first-of-type {
+    color: var(--tertiary);
+  }
+  &:nth-of-type(2) {
+    color: var(--secondary);
+  }
+  &.on {
+    border-color: currentColor;
+    background-color: color-mix(in srgb, currentColor 12%, transparent);
+    font-weight: 600;
+  }
+}
+
+.learn-canvas {
+  cursor: crosshair;
+  border: 1px solid var(--lightgray);
+}
+
+.card-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--lightgray);
+  margin-top: 0.5rem;
+}
+
+a.card-share {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--light);
+}

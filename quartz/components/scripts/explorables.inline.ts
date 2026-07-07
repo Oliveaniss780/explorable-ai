@@ -13,11 +13,63 @@ const svgEl = (tag: string, attrs: Record<string, string | number> = {}) => {
 const cssVar = (name: string) =>
   getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#888"
 
+const hexToRgb = (hex: string): [number, number, number] => {
+  const h = hex.replace("#", "")
+  const v =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h.slice(0, 6)
+  const n = parseInt(v || "888888", 16)
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+}
+const rgba = (hex: string, a: number) => {
+  const [r, g, b] = hexToRgb(hex)
+  return `rgba(${r},${g},${b},${a})`
+}
+
+// small deterministic hash → seeded pseudo-vector (used by the pipeline schematic)
+const hashStr = (s: string) => {
+  let h = 2166136261
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return h >>> 0
+}
+const tokenVec = (tok: string, d = 8): number[] => {
+  let seed = hashStr(tok.toLowerCase()) || 1
+  const v: number[] = []
+  let norm = 0
+  for (let i = 0; i < d; i++) {
+    seed = (seed * 1664525 + 1013904223) >>> 0
+    const x = (seed / 4294967296) * 2 - 1
+    v.push(x)
+    norm += x * x
+  }
+  norm = Math.sqrt(norm) || 1
+  return v.map((x) => x / norm)
+}
+
 function caption(text: string) {
   const p = document.createElement("p")
   p.className = "explorable-note"
   p.textContent = text
   return p
+}
+
+// shared approximate tokenizer (word / subword / punctuation)
+function approxTokens(text: string): string[] {
+  const pieces = text.match(/[A-Za-z]+|[0-9]+|[^\sA-Za-z0-9]/g) || []
+  const toks: string[] = []
+  for (const p of pieces) {
+    if (/^[A-Za-z]+$/.test(p) && p.length > 6) {
+      for (let i = 0; i < p.length; i += 4) toks.push(p.slice(i, i + 4))
+    } else toks.push(p)
+  }
+  return toks
 }
 
 // ── 1. Tokenizer ────────────────────────────────────────────────────────────
@@ -679,8 +731,12 @@ function mountGardenMap(el: HTMLElement) {
       const linkLayer = svgEl("g")
       svg.appendChild(linkLayer)
 
+      const visited = readVisited()
       const nodes = docs.map((d, i) => {
-        const g = svgEl("g", { class: "gmap-node", tabindex: 0 })
+        const g = svgEl("g", {
+          class: "gmap-node" + (visited.has(d.slug) ? " visited" : ""),
+          tabindex: 0,
+        })
         const a = svgEl("a", { href: "/" + d.slug })
         const dot = svgEl("circle", { cx: px(nx[i]), cy: py(ny[i]), r: 5, fill: colorOf(i) })
         const label = svgEl("text", { x: px(nx[i]) + 9, y: py(ny[i]) + 4, class: "gmap-label" })
@@ -744,12 +800,405 @@ function mountGardenMap(el: HTMLElement) {
       })
       holder.appendChild(legend)
 
-      status.textContent =
-        "Every note placed by meaning and coloured by topic — nearby dots share themes. Hover to see a note's closest neighbours; click to open it."
+      const nVisited = docs.filter((d) => visited.has(d.slug)).length
+      status.textContent = `Every note placed by meaning and coloured by topic — nearby dots share themes. Hover for a note's closest neighbours; click to open it.${
+        nVisited ? ` You've explored ${nVisited} of ${N} — those glow.` : ""
+      }`
     })
     .catch(() => {
       status.textContent = "Couldn't build the map (is the site running?)."
     })
+}
+
+// ── 9. Whole-model pipeline (schematic) ──────────────────────────────────────
+function mountPipeline(el: HTMLElement) {
+  const input = document.createElement("textarea")
+  input.className = "explorable-input"
+  input.rows = 2
+  input.value = el.dataset.text || "the cat sat"
+  const stages = document.createElement("div")
+  stages.className = "pipe-stages"
+  el.append(
+    input,
+    stages,
+    caption(
+      "A schematic of the whole flow: token → embedding → attention → next word. The shapes are real; the exact numbers are illustrative.",
+    ),
+  )
+
+  const dot = (a: number[], b: number[]) => {
+    let s = 0
+    for (let i = 0; i < a.length; i++) s += a[i] * b[i]
+    return s
+  }
+  const mkStage = (name: string) => {
+    const s = document.createElement("div")
+    s.className = "pipe-stage"
+    const h = document.createElement("div")
+    h.className = "pipe-stage-h"
+    h.textContent = name
+    const body = document.createElement("div")
+    body.className = "pipe-stage-body"
+    s.append(h, body)
+    stages.appendChild(s)
+    return { s, body }
+  }
+  const sTok = mkStage("1 · Tokens")
+  const sEmb = mkStage("2 · Embeddings")
+  const sAtt = mkStage("3 · Attention")
+  const sNext = mkStage("4 · Next word")
+  const CAND = ["the", "a", "cat", "dog", "sat", "ran", "is", "on", "mat", "and", "quietly", "then"]
+
+  let animTimer = 0
+  const animate = () => {
+    const order = [sTok.s, sEmb.s, sAtt.s, sNext.s]
+    order.forEach((s) => s.classList.remove("lit"))
+    let k = 0
+    clearInterval(animTimer)
+    animTimer = window.setInterval(() => {
+      order.forEach((s) => s.classList.remove("lit"))
+      if (k < order.length) order[k].classList.add("lit")
+      k++
+      if (k > order.length) clearInterval(animTimer)
+    }, 420)
+  }
+
+  const render = () => {
+    const toks = approxTokens(input.value).slice(0, 8)
+    if (toks.length === 0) return
+    const vecs = toks.map((t) => tokenVec(t, 8))
+
+    sTok.body.innerHTML = ""
+    toks.forEach((t, i) => {
+      const c = document.createElement("span")
+      c.className = "token-chip"
+      c.style.setProperty("--i", String(i % 6))
+      c.textContent = t
+      sTok.body.appendChild(c)
+    })
+
+    sEmb.body.innerHTML = ""
+    toks.forEach((t, i) => {
+      const row = document.createElement("div")
+      row.className = "emb-row"
+      const lab = document.createElement("span")
+      lab.className = "emb-row-lab"
+      lab.textContent = t
+      row.appendChild(lab)
+      vecs[i].forEach((x) => {
+        const cell = document.createElement("span")
+        cell.className = "emb-cell"
+        cell.style.backgroundColor =
+          x >= 0 ? rgba(cssVar("--tertiary"), Math.abs(x)) : rgba(cssVar("--secondary"), Math.abs(x))
+        row.appendChild(cell)
+      })
+      sEmb.body.appendChild(row)
+    })
+
+    sAtt.body.innerHTML = ""
+    const grid = document.createElement("div")
+    grid.className = "attn-grid"
+    grid.style.gridTemplateColumns = `auto repeat(${toks.length}, 1fr)`
+    grid.appendChild(document.createElement("span"))
+    toks.forEach((t) => {
+      const h = document.createElement("span")
+      h.className = "attn-h"
+      h.textContent = t
+      grid.appendChild(h)
+    })
+    toks.forEach((_, i) => {
+      const rl = document.createElement("span")
+      rl.className = "attn-h attn-rl"
+      rl.textContent = toks[i]
+      grid.appendChild(rl)
+      const logits = toks.map((__, j) => (j <= i ? dot(vecs[i], vecs[j]) * 3 : -1e9))
+      const mx = Math.max(...logits)
+      const ex = logits.map((l) => Math.exp(l - mx))
+      const sum = ex.reduce((a, b) => a + b, 0)
+      ex.forEach((e, j) => {
+        const cell = document.createElement("span")
+        cell.className = "attn-cell"
+        cell.style.backgroundColor = rgba(cssVar("--tertiary"), j <= i ? Math.min(1, e / sum) : 0)
+        grid.appendChild(cell)
+      })
+    })
+    sAtt.body.appendChild(grid)
+
+    sNext.body.innerHTML = ""
+    const last = vecs[vecs.length - 1]
+    const logs = CAND.map((c) => dot(last, tokenVec(c, 8)) * 4)
+    const mx = Math.max(...logs)
+    const ex = logs.map((l) => Math.exp(l - mx))
+    const sum = ex.reduce((a, b) => a + b, 0)
+    CAND.map((c, k) => ({ c, p: ex[k] / sum }))
+      .sort((a, b) => b.p - a.p)
+      .slice(0, 5)
+      .forEach(({ c, p }) => {
+        const r = document.createElement("div")
+        r.className = "temp-row"
+        const n = document.createElement("span")
+        n.className = "temp-name"
+        n.textContent = c
+        const tr = document.createElement("div")
+        tr.className = "temp-track"
+        const f = document.createElement("div")
+        f.className = "temp-fill"
+        f.style.width = `${(p * 100).toFixed(0)}%`
+        tr.appendChild(f)
+        const pc = document.createElement("span")
+        pc.className = "temp-pct"
+        pc.textContent = `${(p * 100).toFixed(0)}%`
+        r.append(n, tr, pc)
+        sNext.body.appendChild(r)
+      })
+
+    animate()
+  }
+  input.addEventListener("input", render)
+  render()
+  window.addCleanup(() => clearInterval(animTimer))
+}
+
+// ── 10. Teach a neuron (draw your own data) ──────────────────────────────────
+function mountLearn(el: HTMLElement) {
+  let cls = 0 // 0 = A (tertiary), 1 = B (secondary)
+  const bar = document.createElement("div")
+  bar.className = "learn-bar"
+  const mkBtn = (label: string, c: number) => {
+    const b = document.createElement("button")
+    b.type = "button"
+    b.className = "learn-cls" + (c === cls ? " on" : "")
+    b.dataset.c = String(c)
+    b.textContent = label
+    b.addEventListener("click", () => {
+      cls = c
+      sync()
+    })
+    return b
+  }
+  const bA = mkBtn("● Class A", 0)
+  const bB = mkBtn("● Class B", 1)
+  const reset = document.createElement("button")
+  reset.type = "button"
+  reset.className = "explorable-btn"
+  reset.textContent = "Clear"
+  bar.append(bA, bB, reset)
+  const canvas = document.createElement("canvas")
+  canvas.className = "explorable-canvas learn-canvas"
+  canvas.width = 520
+  canvas.height = 340
+  const ctx = canvas.getContext("2d")!
+  el.append(
+    bar,
+    canvas,
+    caption(
+      "Click to drop points of the selected class. A tiny neural network trains live and paints the boundary it has learned — add points and watch it adapt.",
+    ),
+  )
+  const sync = () => {
+    bA.classList.toggle("on", cls === 0)
+    bB.classList.toggle("on", cls === 1)
+  }
+
+  const pts: { x: number; y: number; label: number }[] = [
+    { x: 0.3, y: 0.4, label: 0 },
+    { x: 0.35, y: 0.62, label: 0 },
+    { x: 0.72, y: 0.5, label: 1 },
+    { x: 0.66, y: 0.32, label: 1 },
+  ]
+  const H = 8
+  const rnd = () => (Math.random() * 2 - 1) * 0.8
+  let W1: number[][], b1: number[], W2: number[], b2: number
+  const init = () => {
+    W1 = Array.from({ length: H }, () => [rnd(), rnd()])
+    b1 = Array.from({ length: H }, () => rnd())
+    W2 = Array.from({ length: H }, () => rnd())
+    b2 = rnd()
+  }
+  init()
+  const fwd = (x1: number, x2: number) => {
+    const a1 = new Array(H)
+    for (let h = 0; h < H; h++) a1[h] = Math.tanh(W1[h][0] * x1 + W1[h][1] * x2 + b1[h])
+    let z2 = b2
+    for (let h = 0; h < H; h++) z2 += W2[h] * a1[h]
+    return { out: 1 / (1 + Math.exp(-z2)), a1 }
+  }
+  const trainStep = () => {
+    if (pts.length === 0) return
+    const lr = 0.2
+    const gW1 = Array.from({ length: H }, () => [0, 0])
+    const gb1 = new Array(H).fill(0)
+    const gW2 = new Array(H).fill(0)
+    let gb2 = 0
+    for (const p of pts) {
+      const x1 = p.x * 2 - 1
+      const x2 = (1 - p.y) * 2 - 1
+      const { out, a1 } = fwd(x1, x2)
+      const dz2 = out - p.label
+      gb2 += dz2
+      for (let h = 0; h < H; h++) {
+        gW2[h] += dz2 * a1[h]
+        const dz1 = dz2 * W2[h] * (1 - a1[h] * a1[h])
+        gW1[h][0] += dz1 * x1
+        gW1[h][1] += dz1 * x2
+        gb1[h] += dz1
+      }
+    }
+    const n = pts.length
+    for (let h = 0; h < H; h++) {
+      W1[h][0] -= (lr * gW1[h][0]) / n
+      W1[h][1] -= (lr * gW1[h][1]) / n
+      b1[h] -= (lr * gb1[h]) / n
+      W2[h] -= (lr * gW2[h]) / n
+    }
+    b2 -= (lr * gb2) / n
+  }
+  const draw = () => {
+    const cA = cssVar("--tertiary")
+    const cB = cssVar("--secondary")
+    const gw = 44
+    const gh = 28
+    const cw = canvas.width / gw
+    const ch = canvas.height / gh
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.fillStyle = cssVar("--light")
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    for (let i = 0; i < gw; i++)
+      for (let j = 0; j < gh; j++) {
+        const fx = (i + 0.5) / gw
+        const fy = (j + 0.5) / gh
+        const { out } = fwd(fx * 2 - 1, (1 - fy) * 2 - 1)
+        ctx.fillStyle = rgba(out > 0.5 ? cB : cA, Math.abs(out - 0.5) * 0.55 + 0.04)
+        ctx.fillRect(i * cw, j * ch, cw + 1, ch + 1)
+      }
+    for (const p of pts) {
+      ctx.fillStyle = p.label ? cB : cA
+      ctx.strokeStyle = cssVar("--light")
+      ctx.lineWidth = 1.5
+      ctx.beginPath()
+      ctx.arc(p.x * canvas.width, p.y * canvas.height, 5, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.stroke()
+    }
+  }
+  let raf = 0
+  const loop = () => {
+    for (let k = 0; k < 3; k++) trainStep()
+    draw()
+    raf = requestAnimationFrame(loop)
+  }
+  canvas.addEventListener("click", (e) => {
+    const r = canvas.getBoundingClientRect()
+    pts.push({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height, label: cls })
+  })
+  reset.addEventListener("click", () => {
+    pts.length = 0
+    init()
+  })
+  raf = requestAnimationFrame(loop)
+  window.addCleanup(() => cancelAnimationFrame(raf))
+}
+
+// ── 11. Shareable tokenize card ──────────────────────────────────────────────
+function mountTokenizeCard(el: HTMLElement) {
+  const input = document.createElement("textarea")
+  input.className = "explorable-input"
+  input.rows = 2
+  input.value = el.dataset.text || "attention is all you need"
+  const canvas = document.createElement("canvas")
+  canvas.className = "card-canvas"
+  const W = 1000
+  const H = 520
+  canvas.width = W
+  canvas.height = H
+  const ctx = canvas.getContext("2d")!
+  const bar = document.createElement("div")
+  bar.className = "learn-bar"
+  const dl = document.createElement("button")
+  dl.type = "button"
+  dl.className = "explorable-btn"
+  dl.textContent = "Download PNG"
+  const sh = document.createElement("a")
+  sh.className = "explorable-btn card-share"
+  sh.textContent = "Share on X"
+  sh.target = "_blank"
+  sh.rel = "noopener noreferrer"
+  bar.append(dl, sh)
+  el.append(
+    input,
+    canvas,
+    bar,
+    caption("Type anything, then download or share a card of how a model would tokenize it."),
+  )
+
+  const roundRect = (x: number, y: number, w: number, h: number, r: number) => {
+    ctx.beginPath()
+    ctx.moveTo(x + r, y)
+    ctx.arcTo(x + w, y, x + w, y + h, r)
+    ctx.arcTo(x + w, y + h, x, y + h, r)
+    ctx.arcTo(x, y + h, x, y, r)
+    ctx.arcTo(x, y, x + w, y, r)
+    ctx.closePath()
+  }
+  const render = () => {
+    const light = cssVar("--light")
+    const dark = cssVar("--dark")
+    const sec = cssVar("--secondary")
+    const ter = cssVar("--tertiary")
+    const gray = cssVar("--gray")
+    ctx.fillStyle = light
+    ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = ter
+    ctx.fillRect(0, 0, 16, H)
+    ctx.textBaseline = "top"
+    ctx.fillStyle = gray
+    ctx.font = "600 26px sans-serif"
+    ctx.fillText("OLIVEANISS · EXPLORABLE AI", 60, 52)
+    const toks = approxTokens(input.value)
+    ctx.font = "30px monospace"
+    let x = 60
+    let y = 132
+    const maxX = W - 60
+    toks.forEach((t, i) => {
+      const w = ctx.measureText(t).width + 28
+      if (x + w > maxX) {
+        x = 60
+        y += 60
+      }
+      ctx.fillStyle = i % 2 ? rgba(ter, 0.22) : rgba(sec, 0.22)
+      roundRect(x, y, w, 46, 7)
+      ctx.fill()
+      ctx.fillStyle = dark
+      ctx.fillText(t, x + 14, y + 8)
+      x += w + 10
+    })
+    ctx.fillStyle = gray
+    ctx.font = "22px sans-serif"
+    ctx.fillText(`${toks.length} tokens · oliveaniss.xyz`, 60, H - 56)
+  }
+  const updateShare = () => {
+    const txt = `I tokenized "${input.value.slice(0, 80)}" — see how AI reads text:`
+    sh.href = `https://x.com/intent/tweet?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(
+      "https://oliveaniss.xyz/posts/tokens-the-atoms-of-llms",
+    )}`
+  }
+  input.addEventListener("input", () => {
+    render()
+    updateShare()
+  })
+  dl.addEventListener("click", () => {
+    canvas.toBlob((b) => {
+      if (!b) return
+      const u = URL.createObjectURL(b)
+      const a = document.createElement("a")
+      a.href = u
+      a.download = "tokens.png"
+      a.click()
+      URL.revokeObjectURL(u)
+    })
+  })
+  render()
+  updateShare()
 }
 
 const REGISTRY: Record<string, (el: HTMLElement) => void> = {
@@ -761,6 +1210,9 @@ const REGISTRY: Record<string, (el: HTMLElement) => void> = {
   ask: mountAsk,
   llm: mountLlm,
   "garden-map": mountGardenMap,
+  pipeline: mountPipeline,
+  learn: mountLearn,
+  "tokenize-card": mountTokenizeCard,
 }
 
 function mountExplorables() {
@@ -780,4 +1232,28 @@ function mountExplorables() {
   })
 }
 
+// record which notes the reader has opened, so the Garden Map can light up
+// their trail through the garden
+const VISIT_KEY = "garden-visited"
+function readVisited(): Set<string> {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(VISIT_KEY) || "[]"))
+  } catch {
+    return new Set()
+  }
+}
+function recordVisit() {
+  const slug = document.body.dataset.slug || ""
+  if (!/^(posts|thoughts)\//.test(slug) || slug.endsWith("index")) return
+  try {
+    const set = readVisited()
+    if (set.has(slug)) return
+    set.add(slug)
+    localStorage.setItem(VISIT_KEY, JSON.stringify([...set]))
+  } catch {
+    /* ignore */
+  }
+}
+
 document.addEventListener("nav", mountExplorables)
+document.addEventListener("nav", recordVisit)
