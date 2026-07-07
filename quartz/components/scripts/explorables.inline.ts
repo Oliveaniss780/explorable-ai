@@ -382,18 +382,22 @@ function mountGradientDescent(el: HTMLElement) {
     ctx.fill()
   }
 
+  let onScreen = true
   const step = () => {
+    raf = requestAnimationFrame(step)
+    if (!onScreen) return // paused while scrolled out of view
     const lr = parseFloat(slider.value)
     ballX -= lr * grad(ballX)
     ballX = Math.max(xmin + 0.2, Math.min(xmax - 0.2, ballX))
     span.textContent = `Learning rate: ${lr.toFixed(2)}`
     draw()
-    raf = requestAnimationFrame(step)
   }
   const start = () => {
     cancelAnimationFrame(raf)
     raf = requestAnimationFrame(step)
   }
+  const io = new IntersectionObserver(([e]) => (onScreen = e.isIntersecting), { threshold: 0.01 })
+  io.observe(canvas)
   slider.addEventListener("input", () => {
     span.textContent = `Learning rate: ${parseFloat(slider.value).toFixed(2)}`
   })
@@ -410,7 +414,10 @@ function mountGradientDescent(el: HTMLElement) {
   )
   span.textContent = `Learning rate: ${parseFloat(slider.value).toFixed(2)}`
   start()
-  window.addCleanup(() => cancelAnimationFrame(raf))
+  window.addCleanup(() => {
+    cancelAnimationFrame(raf)
+    io.disconnect()
+  })
 }
 
 // ── 6. Ask the garden (semantic search / live RAG) ──────────────────────────
@@ -1056,8 +1063,8 @@ function mountLearn(el: HTMLElement) {
   const draw = () => {
     const cA = cssVar("--tertiary")
     const cB = cssVar("--secondary")
-    const gw = 44
-    const gh = 28
+    const gw = 36
+    const gh = 22
     const cw = canvas.width / gw
     const ch = canvas.height / gh
     ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -1082,11 +1089,16 @@ function mountLearn(el: HTMLElement) {
     }
   }
   let raf = 0
+  let onScreen = true
+  let frame = 0
   const loop = () => {
-    for (let k = 0; k < 3; k++) trainStep()
-    draw()
     raf = requestAnimationFrame(loop)
+    if (!onScreen) return // paused while scrolled out of view
+    for (let k = 0; k < 2; k++) trainStep()
+    if (frame++ % 2 === 0) draw() // heavy boundary redraw at ~30fps
   }
+  const io = new IntersectionObserver(([e]) => (onScreen = e.isIntersecting), { threshold: 0.01 })
+  io.observe(canvas)
   canvas.addEventListener("click", (e) => {
     const r = canvas.getBoundingClientRect()
     pts.push({ x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height, label: cls })
@@ -1096,7 +1108,10 @@ function mountLearn(el: HTMLElement) {
     init()
   })
   raf = requestAnimationFrame(loop)
-  window.addCleanup(() => cancelAnimationFrame(raf))
+  window.addCleanup(() => {
+    cancelAnimationFrame(raf)
+    io.disconnect()
+  })
 }
 
 // ── 11. Shareable tokenize card ──────────────────────────────────────────────

@@ -524,8 +524,17 @@ async function renderGraph(graph: HTMLElement, fullSlug: FullSlug) {
   }
 
   let stopAnimation = false
+  // pause the render loop while the graph is scrolled out of view — after the
+  // force simulation settles it would otherwise re-render the same frame forever
+  let onScreen = true
+  const visObserver = new IntersectionObserver(([e]) => (onScreen = e.isIntersecting), {
+    threshold: 0.01,
+  })
+  visObserver.observe(graph)
   function animate(time: number) {
     if (stopAnimation) return
+    requestAnimationFrame(animate)
+    if (!onScreen) return
     for (const n of nodeRenderData) {
       const { x, y } = n.simulationData
       if (!x || !y) continue
@@ -546,12 +555,12 @@ async function renderGraph(graph: HTMLElement, fullSlug: FullSlug) {
 
     tweens.forEach((t) => t.update(time))
     app.renderer.render(stage)
-    requestAnimationFrame(animate)
   }
 
   requestAnimationFrame(animate)
   return () => {
     stopAnimation = true
+    visObserver.disconnect()
     app.destroy()
   }
 }
