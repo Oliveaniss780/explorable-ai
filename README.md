@@ -6,6 +6,14 @@
 
 <p align="center"><em>Type a sentence and watch the whole model run — tokens, embeddings, attention, next word — recomputing as you type. Nothing here is a diagram; it is the thing itself.</em></p>
 
+<p align="center">
+  <a href="https://my-web-seven-brown-60.vercel.app"><b>Live demo</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Oliveaniss780/explorable-ai/generate"><b>Use this template</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://vercel.com/new/clone?repository-url=https://github.com/Oliveaniss780/explorable-ai"><img src="https://vercel.com/button" alt="Deploy with Vercel" height="26" align="center"></a>
+</p>
+
 Most explanations of machine learning hand you one of two things: a wall of equations, or a metaphor so loose it falls apart the moment you lean on it. I wanted a third option — pages you can poke at. Every idea here (tokens, embeddings, attention, sampling, training) comes with a small widget you can type into, drag, or watch run. Change the input and the whole thing recomputes in front of you.
 
 The site is live at **https://my-web-seven-brown-60.vercel.app**.
@@ -94,9 +102,18 @@ quartz.config.ts    site config: theme, fonts, plugins
 quartz.layout.ts    what goes where on each page
 ```
 
-## Deploying
+## Make your own
 
-Every push to `main` triggers a build on Vercel (`npx quartz build`, output written to `public/`). Pushing to any other branch gives you a preview URL for that branch.
+This repository is a template — you can grow your own garden from it, and none of it requires touching the engine.
+
+1. **Start from it.** Click **[Use this template](https://github.com/Oliveaniss780/explorable-ai/generate)** for your own copy, or the **Deploy with Vercel** button above to get a live site in one step.
+2. **Write.** Everything the site shows lives in `content/` as Markdown. Delete mine and add yours; links between notes use `[[wikilink]]` syntax, and the graph builds itself from them.
+3. **Re-theme.** The two colour palettes and the three fonts are a few lines near the top of `quartz.config.ts` — swap them and the whole site (and every widget) follows.
+4. **Add explorables.** Drop a placeholder like `<div class="explorable" data-explorable="attention"></div>` into any note. The widgets are all defined in `quartz/components/scripts/explorables.inline.ts`.
+
+### Deploying
+
+The one-click **Deploy with Vercel** button reads `vercel.json` for you — build with `npx quartz build`, output in `public/`, on Node 22 — and wires up the repo. After that, every push to `main` rebuilds and redeploys automatically, and any other branch gets its own preview URL. The same static output works on Netlify, GitHub Pages, or any static host.
 
 ## Credits
 
