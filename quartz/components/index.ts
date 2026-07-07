@@ -30,6 +30,7 @@ import Newsletter from "./Newsletter"
 import Pwa from "./Pwa"
 import Explorables from "./Explorables"
 import SeriesNav from "./SeriesNav"
+import GraphResources from "./GraphResources"
 
 export {
   ArticleTitle,
@@ -64,4 +65,5 @@ export {
   Pwa,
   Explorables,
   SeriesNav,
+  GraphResources,
 }

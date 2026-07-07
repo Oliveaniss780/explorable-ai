@@ -57,6 +57,7 @@ export const sharedPageComponents: SharedLayout = {
     ...recentNotes.map((c) => Component.MobileOnly(c)),
     Component.Pwa(),
     Component.Explorables(),
+    Component.GraphResources(),
   ],
   footer: Component.Footer({
     links: {
@@ -88,11 +89,7 @@ export const defaultContentPageLayout: PageLayout = {
     Component.TagList(),
   ],
   left,
-  right: [
-    Component.DesktopOnly(Component.TableOfContents()),
-    Component.Backlinks(),
-    Component.Graph(),
-  ],
+  right: [Component.DesktopOnly(Component.TableOfContents()), Component.Backlinks()],
 }
 
 // components for pages that display lists of pages  (e.g. tags or folders)
