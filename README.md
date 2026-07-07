@@ -1,18 +1,31 @@
-# Quartz v4
+# Oliveaniss — an Explorable AI garden
 
-> “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
+A digital garden about how AI actually works — built around **explorables**: small, interactive widgets you can poke at to build intuition (tokenizers, embeddings, attention maps, gradient descent, and more).
 
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
-Quartz v4 features a from-the-ground rewrite focusing on end-user extensibility and ease-of-use.
+🌐 **Live:** https://my-web-seven-brown-60.vercel.app
 
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+## Running locally
 
-[Join the Discord Community](https://discord.gg/cRFFHYye7t)
+Requires Node ≥ 22.
 
-## Sponsors
+```bash
+npm install
+npx quartz build --serve
+```
 
-<p align="center">
-  <a href="https://github.com/sponsors/jackyzha0">
-    <img src="https://cdn.jsdelivr.net/gh/jackyzha0/jackyzha0/sponsorkit/sponsors.svg" />
-  </a>
-</p>
+Then open http://localhost:8080.
+
+## Structure
+
+- `content/` — the notes and pages (Markdown). This is the garden.
+- `quartz/` — the static-site engine (Preact SSR + remark/rehype) that turns `content/` into HTML.
+- `quartz.config.ts` / `quartz.layout.ts` — site configuration and page layout.
+- `quartz/components/scripts/explorables.inline.ts` — the interactive widgets.
+
+## Deploy
+
+Every push to `main` auto-deploys to Vercel (`npx quartz build` → `public/`).
+
+---
+
+Built on the [Quartz](https://quartz.jzhao.xyz/) static-site generator (MIT).

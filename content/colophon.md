@@ -7,7 +7,7 @@ A colophon is a note on how a thing was made. Here's how this garden grows.
 
 ## Built with
 
-- **[Quartz](https://github.com/Oliveaniss780/quartz)** — a static-site generator that turns a folder of Markdown into a linked website.
+- **[Quartz](https://quartz.jzhao.xyz/)** — a static-site generator that turns a folder of Markdown into a linked website.
 - **Preact** for templating, rendered to static HTML at build time.
 - **unified / remark / rehype** for the Markdown → HTML pipeline.
 
@@ -25,7 +25,7 @@ A single site-wide script scans every page for these placeholders and hydrates t
 
 - **Sidenotes** float into the margin on wide screens, letterpress-style.
 - **Reading progress** and page **view transitions** are pure-CSS / native-API enhancements.
-- A decorative **komorebi** scene greets you on the home page, rendered with Three.js.
+- An interactive **garden graph** greets you on the home page — every note as a node, linked by the connections between them.
 
 ## Type & colour
 
