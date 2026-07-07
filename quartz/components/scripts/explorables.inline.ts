@@ -1201,6 +1201,106 @@ function mountTokenizeCard(el: HTMLElement) {
   updateShare()
 }
 
+// ── 12. GitHub contribution calendar (themed) ───────────────────────────────
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+function mountCommits(el: HTMLElement) {
+  const user = el.dataset.user || "Oliveaniss"
+  const holder = document.createElement("div")
+  holder.className = "cal-holder"
+  const status = caption(`Loading commit activity for @${user}…`)
+  el.append(holder, status)
+
+  fetch(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(user)}?y=last`)
+    .then((r) => (r.ok ? r.json() : Promise.reject()))
+    .then((data: any) => {
+      const days: { date: string; count: number; level: number }[] = data.contributions || []
+      if (!days.length) {
+        status.textContent = `No public activity found for @${user}.`
+        return
+      }
+
+      const CELL = 12
+      const GAP = 3
+      const TOP = 16
+      const STEP = CELL + GAP
+      let col = 0
+      const cells = days.map((d, i) => {
+        const dow = new Date(d.date + "T00:00:00").getDay()
+        if (i > 0 && dow === 0) col++
+        return { ...d, col, dow }
+      })
+      const cols = col + 1
+      const W = cols * STEP
+      const H = TOP + 7 * STEP
+      const svg = svgEl("svg", { viewBox: `0 0 ${W} ${H}`, class: "cal-svg", role: "img" })
+
+      // themed level colours: lightgray → amber
+      const c0 = hexToRgb(cssVar("--lightgray"))
+      const c1 = hexToRgb(cssVar("--tertiary"))
+      const lvlColor = (l: number) => {
+        if (l <= 0) return `rgb(${c0[0]},${c0[1]},${c0[2]})`
+        const t = 0.2 + 0.8 * (Math.min(4, l) / 4)
+        const m = (a: number, b: number) => Math.round(a + (b - a) * t)
+        return `rgb(${m(c0[0], c1[0])},${m(c0[1], c1[1])},${m(c0[2], c1[2])})`
+      }
+
+      // month labels along the top
+      const colMonth: Record<number, number> = {}
+      cells.forEach((c) => {
+        if (colMonth[c.col] === undefined) colMonth[c.col] = new Date(c.date + "T00:00:00").getMonth()
+      })
+      let prevM = -1
+      for (let cc = 0; cc < cols; cc++) {
+        const m = colMonth[cc]
+        if (m !== undefined && m !== prevM) {
+          prevM = m
+          const t = svgEl("text", { x: cc * STEP, y: 10, class: "cal-month" })
+          t.textContent = MONTHS[m]
+          svg.appendChild(t)
+        }
+      }
+
+      cells.forEach((c) => {
+        const rect = svgEl("rect", {
+          x: c.col * STEP,
+          y: TOP + c.dow * STEP,
+          width: CELL,
+          height: CELL,
+          rx: 2,
+          fill: lvlColor(c.level),
+        })
+        const title = document.createElementNS(NS, "title")
+        title.textContent = `${c.count} contribution${c.count === 1 ? "" : "s"} on ${c.date}`
+        rect.appendChild(title)
+        svg.appendChild(rect)
+      })
+      holder.appendChild(svg)
+
+      // legend
+      const legend = document.createElement("div")
+      legend.className = "cal-legend"
+      const less = document.createElement("span")
+      less.textContent = "Less"
+      legend.appendChild(less)
+      for (let l = 0; l <= 4; l++) {
+        const sw = document.createElement("span")
+        sw.className = "cal-swatch"
+        sw.style.backgroundColor = lvlColor(l)
+        legend.appendChild(sw)
+      }
+      const more = document.createElement("span")
+      more.textContent = "More"
+      legend.appendChild(more)
+      holder.appendChild(legend)
+
+      const total = data.total?.lastYear ?? days.reduce((s, d) => s + d.count, 0)
+      status.textContent = `${total} contributions in the last year on GitHub (@${user}). Darker squares = more commits that day.`
+    })
+    .catch(() => {
+      status.textContent = `Couldn't load GitHub activity for @${user} (the account may be private, or the API is rate-limited).`
+    })
+}
+
 const REGISTRY: Record<string, (el: HTMLElement) => void> = {
   tokenizer: mountTokenizer,
   embeddings: mountEmbeddings,
@@ -1213,6 +1313,7 @@ const REGISTRY: Record<string, (el: HTMLElement) => void> = {
   pipeline: mountPipeline,
   learn: mountLearn,
   "tokenize-card": mountTokenizeCard,
+  commits: mountCommits,
 }
 
 function mountExplorables() {

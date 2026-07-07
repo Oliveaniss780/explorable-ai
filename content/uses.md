@@ -8,7 +8,7 @@ _A running list of the tools I reach for. Inspired by [uses.tech](https://uses.t
 ## Making the explainers
 
 - **Visualizations:** hand-written SVG and `<canvas>`, driven by the site's theme variables so every widget flips with light/dark mode.
-- **This site:** [Quartz](https://github.com/Oliveaniss/quartz) — a static-site generator for digital gardens. The interactive widgets are mounted from plain `<div>` placeholders dropped into Markdown.
+- **This site:** [Quartz](https://github.com/Oliveaniss780/quartz) — a static-site generator for digital gardens. The interactive widgets are mounted from plain `<div>` placeholders dropped into Markdown.
 
 ## Writing & thinking
 

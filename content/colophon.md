@@ -7,7 +7,7 @@ A colophon is a note on how a thing was made. Here's how this garden grows.
 
 ## Built with
 
-- **[Quartz](https://github.com/Oliveaniss/quartz)** — a static-site generator that turns a folder of Markdown into a linked website.
+- **[Quartz](https://github.com/Oliveaniss780/quartz)** — a static-site generator that turns a folder of Markdown into a linked website.
 - **Preact** for templating, rendered to static HTML at build time.
 - **unified / remark / rehype** for the Markdown → HTML pipeline.
 
@@ -31,4 +31,4 @@ A single site-wide script scans every page for these placeholders and hydrates t
 
 Set in DM Serif Display, Bricolage Grotesque, and JetBrains Mono, over a two-ink palette that inverts from warm-paper day to cyanotype night.
 
-_The full source lives on [GitHub](https://github.com/Oliveaniss)._
+_The full source lives on [GitHub](https://github.com/Oliveaniss780)._
