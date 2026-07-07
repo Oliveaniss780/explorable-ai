@@ -34,6 +34,10 @@ The clip at the top of this page is one of them — the pipeline widget from [th
 
 One site-wide script finds every placeholder on a page and hydrates it into a live canvas or SVG. The widgets read the site's theme variables directly, so they recolour themselves the instant you flip between day and night.
 
+![Dragging a temperature slider as the next-word odds slide from one confident spike toward a flat, random spread](.github/readme/temperature.gif)
+
+<p align="center"><em>Another one: drag the temperature slider and the model's next-word odds slide from a single confident guess toward a flat, unpredictable spread.</em></p>
+
 There are about a dozen of them. A few I am fond of:
 
 - **pipeline** — the screenshot above: token, embedding, attention, and next word, end to end, recomputed as you type.
