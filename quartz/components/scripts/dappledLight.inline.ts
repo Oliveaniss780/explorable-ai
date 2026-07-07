@@ -498,9 +498,10 @@ function initScene(container: HTMLElement) {
   let colB = cssVar("--komorebi-shadow")
   let chartRGB = rgbStr("--secondary")
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  // render at the display's native resolution (capped) so the scene is crisp
-  // rather than the old half-res, nearest-neighbor-upscaled look
-  const dpr = Math.min(window.devicePixelRatio || 1, 2)
+  // render near native CSS resolution — crisp (image-rendering:auto smooths any
+  // retina upscale) but far lighter than full 2x-DPR, which lagged next to the
+  // graph view's WebGL
+  const dpr = Math.min(window.devicePixelRatio || 1, 1)
 
   let w = 600
   let h = 180
@@ -790,16 +791,29 @@ function initScene(container: HTMLElement) {
     }
     if (running) raf = requestAnimationFrame(loop)
   }
-  const onVis = () => {
-    if (document.hidden) {
-      running = false
-      cancelAnimationFrame(raf)
-    } else if (!reduce) {
+  // run only when the tab is visible AND the scene is on-screen; otherwise the
+  // shader keeps burning GPU while scrolled far below the fold
+  let onScreen = true
+  const sync = () => {
+    const shouldRun = !document.hidden && onScreen && !reduce
+    if (shouldRun && !running) {
       running = true
       prevMs = 0
       raf = requestAnimationFrame(loop)
+    } else if (!shouldRun && running) {
+      running = false
+      cancelAnimationFrame(raf)
     }
   }
+  const onVis = () => sync()
+  const io = new IntersectionObserver(
+    (entries) => {
+      onScreen = entries[0]?.isIntersecting ?? true
+      sync()
+    },
+    { threshold: 0.01 },
+  )
+  io.observe(container)
 
   if (reduce) {
     draw()
@@ -812,6 +826,7 @@ function initScene(container: HTMLElement) {
     running = false
     cancelAnimationFrame(raf)
     ro.disconnect()
+    io.disconnect()
     window.removeEventListener("pointermove", onMove)
     window.removeEventListener("deviceorientation", onTilt)
     document.removeEventListener("themechange", syncColors)
