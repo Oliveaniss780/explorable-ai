@@ -2,7 +2,9 @@
 
 *An explorable garden about how modern AI actually works.*
 
-![The Oliveaniss home page — a force-directed graph of the garden above the opening essay](.github/readme/hero.png)
+![Typing a sentence into the pipeline widget while tokens, embeddings, attention, and the next-word guess build up stage by stage](.github/readme/pipeline.gif)
+
+<p align="center"><em>Type a sentence and watch the whole model run — tokens, embeddings, attention, next word — recomputing as you type. Nothing here is a diagram; it is the thing itself.</em></p>
 
 Most explanations of machine learning hand you one of two things: a wall of equations, or a metaphor so loose it falls apart the moment you lean on it. I wanted a third option — pages you can poke at. Every idea here (tokens, embeddings, attention, sampling, training) comes with a small widget you can type into, drag, or watch run. Change the input and the whole thing recomputes in front of you.
 
@@ -24,9 +26,7 @@ Around the essays sits a set of short [concept notes](https://my-web-seven-brown
 
 ## The explorables
 
-![The pipeline widget: a sentence flowing through tokens, embeddings, attention, and next-word probabilities](.github/readme/post-model.png)
-
-Each widget begins life as a plain placeholder in Markdown:
+The clip at the top of this page is one of them — the pipeline widget from [the whole model on one screen](https://my-web-seven-brown-60.vercel.app/posts/the-whole-model). Each widget begins life as a plain placeholder in Markdown:
 
 ```html
 <div class="explorable" data-explorable="attention"></div>

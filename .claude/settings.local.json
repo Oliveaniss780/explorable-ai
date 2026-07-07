@@ -48,7 +48,15 @@
       "Bash(vercel --version)",
       "Bash(vercel whoami *)",
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}  \\(%{size_download} bytes\\)\\\\n\" https://my-web-seven-brown-60.vercel.app)",
-      "Bash(curl -s https://my-web-seven-brown-60.vercel.app)"
+      "Bash(curl -s https://my-web-seven-brown-60.vercel.app)",
+      "Bash(command -v gifski)",
+      "Bash(gifski --version)",
+      "Bash(awk '/function mountPipeline/,/^}/' quartz/components/scripts/explorables.inline.ts)",
+      "Bash(gifski -o .github/readme/pipeline.gif --fps 12 --quality 90 --width 720 /private/tmp/gifgen/frames/f*.png)",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(sips -g pixelWidth -g pixelHeight .github/readme/pipeline.gif)",
+      "Bash(lsof -tiTCP:8080 -sTCP:LISTEN)",
+      "Bash(xargs kill)"
     ]
   }
 }
