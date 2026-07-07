@@ -28,4 +28,4 @@ Every push to `main` auto-deploys to Vercel (`npx quartz build` → `public/`).
 
 ---
 
-Built on the [Quartz](https://quartz.jzhao.xyz/) static-site generator (MIT).
+Built on the Quartz static-site generator (MIT).

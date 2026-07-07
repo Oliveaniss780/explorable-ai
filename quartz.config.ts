@@ -3,9 +3,7 @@ import * as Plugin from "./quartz/plugins"
 import { letterpressOgImage } from "./quartz/util/ogTemplate"
 
 /**
- * Quartz 4 Configuration
- *
- * See https://quartz.jzhao.xyz/configuration for more information.
+ * Site configuration for the Oliveaniss garden.
  */
 const config: QuartzConfig = {
   configuration: {
