@@ -2,9 +2,11 @@
 
 *An explorable garden about how modern AI actually works.*
 
-![Typing a sentence into the pipeline widget while tokens, embeddings, attention, and the next-word guess build up stage by stage](.github/readme/pipeline.gif)
+<p align="center">
+  <img src=".github/readme/pipeline.png" alt="One sentence traced through the whole model — tokens, embeddings, attention, and the next-word guess" width="560">
+</p>
 
-<p align="center"><em>Type a sentence and watch the whole model run — tokens, embeddings, attention, next word — recomputing as you type. Nothing here is a diagram; it is the thing itself.</em></p>
+<p align="center"><em>One sentence through the whole model — tokens, embeddings, attention, and its guess at the next word. On the live site it recomputes as you type; nothing here is a diagram, it is the thing itself.</em></p>
 
 <p align="center">
   <a href="https://my-web-seven-brown-60.vercel.app"><b>Live demo</b></a>
@@ -42,9 +44,18 @@ The clip at the top of this page is one of them — the pipeline widget from [th
 
 One site-wide script finds every placeholder on a page and hydrates it into a live canvas or SVG. The widgets read the site's theme variables directly, so they recolour themselves the instant you flip between day and night.
 
-![Dragging a temperature slider as the next-word odds slide from one confident spike toward a flat, random spread](.github/readme/temperature.gif)
+<table>
+  <tr>
+    <td width="50%"><img src=".github/readme/temp-low.png" alt="Temperature 0.1 — one word takes almost all the probability"></td>
+    <td width="50%"><img src=".github/readme/temp-high.png" alt="Temperature 2.0 — the probability spreads across many words"></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Low temperature — one confident guess</em></td>
+    <td align="center"><em>High temperature — a flat, random spread</em></td>
+  </tr>
+</table>
 
-<p align="center"><em>Another one: drag the temperature slider and the model's next-word odds slide from a single confident guess toward a flat, unpredictable spread.</em></p>
+<p align="center"><em>The temperature widget: the same next-word odds, at two ends of the slider. Drag it on the live site to watch one melt into the other.</em></p>
 
 There are about a dozen of them. A few I am fond of:
 
