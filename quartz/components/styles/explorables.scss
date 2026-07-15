@@ -728,3 +728,170 @@ a.card-share {
   font-size: 0.74rem;
   color: var(--gray);
 }
+
+// ── MCP (Model Context Protocol) ─────────────────────────────────────────────
+.mcp-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+.mcp-tlab {
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+.mcp-seg {
+  display: inline-flex;
+  border: 1px solid var(--lightgray);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.mcp-seg button {
+  padding: 0.35rem 0.7rem;
+  border: none;
+  background: var(--light);
+  color: var(--darkgray);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.mcp-seg button.on {
+  background: var(--secondary);
+  color: var(--light);
+}
+
+.mcp-diagram {
+  display: flex;
+  align-items: stretch;
+  gap: 0.6rem;
+}
+.mcp-node {
+  flex: 0 0 auto;
+  min-width: 8.5rem;
+  max-width: 15rem;
+  padding: 0.8rem;
+  border: 1px solid var(--lightgray);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--secondary) 5%, transparent);
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+.mcp-node-t {
+  font-family: var(--headerFont, serif);
+  color: var(--dark);
+  font-size: 1.02rem;
+}
+.mcp-node-s {
+  margin-top: 0.15rem;
+  font-size: 0.7rem;
+  color: var(--gray);
+}
+.mcp-pulse {
+  border-color: var(--tertiary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tertiary) 30%, transparent);
+}
+
+.mcp-wire {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 4.5rem;
+  align-self: center;
+  height: 2.4rem;
+}
+.mcp-wire::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--lightgray);
+}
+.mcp-packet {
+  position: absolute;
+  top: 50%;
+  left: 6%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  transition: left 0.65s ease;
+}
+.mcp-packet.req {
+  background: var(--secondary);
+}
+.mcp-packet.res {
+  background: var(--tertiary);
+}
+.mcp-wire-label {
+  position: absolute;
+  top: calc(50% + 0.55rem);
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.66rem;
+  color: var(--gray);
+}
+
+.mcp-caps {
+  margin-top: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.mcp-cap-h {
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 0.2rem;
+}
+.mcp-cap {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 0.2rem 0;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--lightgray);
+  border-radius: 7px;
+  background: var(--light);
+  color: var(--secondary);
+  font-family: var(--codeFont, monospace);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.mcp-cap:hover {
+  border-color: var(--tertiary);
+}
+.mcp-cap:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.mcp-log {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.mcp-log-lab {
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 0.2rem;
+}
+.mcp-log-json {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  background: var(--lightgray);
+  border-radius: 8px;
+  font-family: var(--codeFont, monospace);
+  font-size: 0.76rem;
+  color: var(--dark);
+  overflow-x: auto;
+  white-space: pre;
+}

@@ -1612,10 +1612,196 @@ function mountTokenCompare(el: HTMLElement) {
   ensure("cl100k")
 }
 
+// MCP (Model Context Protocol) explorable: click a capability and watch a
+// JSON-RPC message travel from an MCP client to a server and back. On-theme:
+// the demo server exposes the garden's notes as tools/resources/prompts.
+function mountMcp(el: HTMLElement) {
+  let busy = false
+  let reqId = 0
+
+  type Call = { kind: string; label: string; method: string; params: any; result: any }
+  const CALLS: Call[] = [
+    {
+      kind: "Tools",
+      label: "tools/list",
+      method: "tools/list",
+      params: {},
+      result: {
+        tools: [
+          { name: "search_notes", description: "Find notes by meaning" },
+          { name: "get_note", description: "Read one note's content" },
+        ],
+      },
+    },
+    {
+      kind: "Tools",
+      label: "search_notes",
+      method: "tools/call",
+      params: { name: "search_notes", arguments: { query: "attention" } },
+      result: { content: [{ type: "text", text: "3 matches: attention, transformer, softmax" }] },
+    },
+    {
+      kind: "Tools",
+      label: "get_note",
+      method: "tools/call",
+      params: { name: "get_note", arguments: { slug: "thoughts/attention" } },
+      result: {
+        content: [{ type: "text", text: "Attention lets a model pull in info from other tokens…" }],
+      },
+    },
+    {
+      kind: "Resources",
+      label: "resources/read",
+      method: "resources/read",
+      params: { uri: "note://thoughts/embedding" },
+      result: {
+        contents: [
+          {
+            uri: "note://thoughts/embedding",
+            mimeType: "text/markdown",
+            text: "An embedding is a token turned into a vector…",
+          },
+        ],
+      },
+    },
+    {
+      kind: "Prompts",
+      label: "prompts/get",
+      method: "prompts/get",
+      params: { name: "explain_simply", arguments: { topic: "softmax" } },
+      result: {
+        messages: [{ role: "user", content: { type: "text", text: "Explain softmax like I'm five." } }],
+      },
+    },
+  ]
+
+  const controls = document.createElement("div")
+  controls.className = "mcp-controls"
+  const tlab = document.createElement("span")
+  tlab.className = "mcp-tlab"
+  tlab.textContent = "Transport"
+  const seg = document.createElement("div")
+  seg.className = "mcp-seg"
+  const bStdio = document.createElement("button")
+  bStdio.type = "button"
+  bStdio.textContent = "stdio"
+  const bHttp = document.createElement("button")
+  bHttp.type = "button"
+  bHttp.textContent = "Streamable HTTP"
+  seg.append(bStdio, bHttp)
+  controls.append(tlab, seg)
+
+  const mkNode = (title: string, sub: string) => {
+    const n = document.createElement("div")
+    n.className = "mcp-node"
+    const t = document.createElement("div")
+    t.className = "mcp-node-t"
+    t.textContent = title
+    const s = document.createElement("div")
+    s.className = "mcp-node-s"
+    s.textContent = sub
+    n.append(t, s)
+    return n
+  }
+  const client = mkNode("MCP Client", "Claude · Cursor · VS Code")
+  const server = mkNode("MCP Server", "garden-mcp")
+
+  const wire = document.createElement("div")
+  wire.className = "mcp-wire"
+  const packet = document.createElement("div")
+  packet.className = "mcp-packet"
+  const wlabel = document.createElement("div")
+  wlabel.className = "mcp-wire-label"
+  wire.append(packet, wlabel)
+
+  const caps = document.createElement("div")
+  caps.className = "mcp-caps"
+  const buttons: HTMLButtonElement[] = []
+  ;["Tools", "Resources", "Prompts"].forEach((k) => {
+    const group = document.createElement("div")
+    const h = document.createElement("div")
+    h.className = "mcp-cap-h"
+    h.textContent = k
+    group.appendChild(h)
+    CALLS.filter((c) => c.kind === k).forEach((c) => {
+      const b = document.createElement("button")
+      b.type = "button"
+      b.className = "mcp-cap"
+      b.textContent = c.label
+      b.addEventListener("click", () => run(c))
+      buttons.push(b)
+      group.appendChild(b)
+    })
+    caps.appendChild(group)
+  })
+  server.appendChild(caps)
+
+  const diagram = document.createElement("div")
+  diagram.className = "mcp-diagram"
+  diagram.append(client, wire, server)
+
+  const log = document.createElement("div")
+  log.className = "mcp-log"
+
+  const hint = caption(
+    "Click a capability on the server. A JSON-RPC message travels client → server and back. It is the same protocol whether the transport is local (stdio) or remote (Streamable HTTP).",
+  )
+  el.append(controls, diagram, log, hint)
+
+  const setTransport = (t: "stdio" | "http") => {
+    bStdio.classList.toggle("on", t === "stdio")
+    bHttp.classList.toggle("on", t === "http")
+    wlabel.textContent = t === "stdio" ? "stdio · local process" : "Streamable HTTP · remote"
+  }
+  bStdio.addEventListener("click", () => setTransport("stdio"))
+  bHttp.addEventListener("click", () => setTransport("http"))
+  setTransport("http")
+
+  const addLog = (dir: string, obj: any) => {
+    const row = document.createElement("div")
+    const lab = document.createElement("div")
+    lab.className = "mcp-log-lab"
+    lab.textContent = dir
+    const pre = document.createElement("pre")
+    pre.className = "mcp-log-json"
+    pre.textContent = JSON.stringify(obj, null, 2)
+    row.append(lab, pre)
+    log.appendChild(row)
+    log.scrollTop = log.scrollHeight
+  }
+
+  const run = (c: Call) => {
+    if (busy) return
+    busy = true
+    buttons.forEach((b) => (b.disabled = true))
+    log.innerHTML = ""
+    const id = ++reqId
+    packet.className = "mcp-packet req"
+    packet.style.left = "6%"
+    void packet.offsetWidth
+    packet.style.left = "90%"
+    window.setTimeout(() => {
+      server.classList.add("mcp-pulse")
+      window.setTimeout(() => server.classList.remove("mcp-pulse"), 320)
+      addLog("client → server · request", { jsonrpc: "2.0", id, method: c.method, params: c.params })
+      packet.className = "mcp-packet res"
+      packet.style.left = "6%"
+      window.setTimeout(() => {
+        client.classList.add("mcp-pulse")
+        window.setTimeout(() => client.classList.remove("mcp-pulse"), 320)
+        addLog("server → client · response", { jsonrpc: "2.0", id, result: c.result })
+        busy = false
+        buttons.forEach((b) => (b.disabled = false))
+      }, 700)
+    }, 700)
+  }
+}
+
 const REGISTRY: Record<string, (el: HTMLElement) => void> = {
   tokenizer: mountTokenizer,
   "token-cost": mountTokenCost,
   "token-compare": mountTokenCompare,
+  mcp: mountMcp,
   embeddings: mountEmbeddings,
   attention: mountAttention,
   temperature: mountTemperature,
