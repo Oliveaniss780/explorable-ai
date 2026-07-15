@@ -31,6 +31,7 @@ import Pwa from "./Pwa"
 import Explorables from "./Explorables"
 import SeriesNav from "./SeriesNav"
 import GraphResources from "./GraphResources"
+import AiAssistant from "./AiAssistant"
 
 export {
   ArticleTitle,
@@ -66,4 +67,5 @@ export {
   Explorables,
   SeriesNav,
   GraphResources,
+  AiAssistant,
 }

@@ -8,7 +8,7 @@ tags:
   - transformers
 ---
 
-In 2017 a paper with a cocky title — _Attention Is All You Need_ — introduced the **[[thoughts/transformer|transformer]]**, the architecture behind essentially every large language model today. Its core idea is deceptively simple: to understand a word, look at the _other_ words that matter to it.
+In 2017 a paper with a cocky title (_Attention Is All You Need_) introduced the **[[thoughts/transformer|transformer]]**, the architecture behind essentially every large language model today. Its core idea is deceptively simple: to understand a word, look at the _other_ words that matter to it.
 
 That looking is called **[[thoughts/attention|attention]]**.
 
@@ -16,7 +16,7 @@ Click any word in the sentence below. The other words darken in proportion to ho
 
 <div class="explorable" data-explorable="attention"></div>
 
-Click **it**. Notice that it lights up **cat** — the model has learned that the pronoun refers back to the cat, not the verb or the mood. This is _coreference_, and no one programmed it. It emerged from reading.
+Click **it**. Notice that it lights up **cat**, the model has learned that the pronoun refers back to the cat, not the verb or the mood. This is _coreference_, and no one programmed it. It emerged from reading.
 
 ## What's actually happening
 
@@ -30,6 +30,6 @@ Each query is compared against every key. Strong matches get high scores; a **[[
 
 ## Why it beat everything before it
 
-Older models (RNNs) read left-to-right, passing a single memory forward — so distant words faded. Attention lets _any_ word talk to _any_ other word in one step, and all those comparisons happen **in parallel**. That parallelism is why transformers scale to billions of parameters and trillions of tokens.
+Older models (RNNs) read left-to-right, passing a single memory forward, so distant words faded. Attention lets _any_ word talk to _any_ other word in one step, and all those comparisons happen **in parallel**. That parallelism is why transformers scale to billions of parameters and trillions of tokens.
 
-Everything downstream — [[posts/temperature-and-sampling|how it picks the next word]], [[posts/watch-a-model-learn|how it learns]] — sits on top of this one move.
+Everything downstream ([[posts/temperature-and-sampling|how it picks the next word]], [[posts/watch-a-model-learn|how it learns]]) sits on top of this one move.

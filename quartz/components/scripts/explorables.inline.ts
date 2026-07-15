@@ -108,10 +108,10 @@ function mountTokenizer(el: HTMLElement) {
     let label: string
     if (realTokenize) {
       toks = realTokenize(input.value)
-      label = `${toks.length} tokens — real byte-pair encoding (cl100k_base, the GPT-4 tokenizer). “·” marks a leading space.`
+      label = `${toks.length} tokens, real byte-pair encoding (cl100k_base, the GPT-4 tokenizer). “·” marks a leading space.`
     } else {
       toks = approx(input.value)
-      label = `${toks.length} tokens — approximate; ${status}`
+      label = `${toks.length} tokens, approximate; ${status}`
     }
     toks.forEach((t, i) => {
       const chip = document.createElement("span")
@@ -227,7 +227,7 @@ function mountEmbeddings(el: HTMLElement) {
   el.appendChild(svg)
   el.appendChild(
     caption(
-      "Hover a word: nearby words mean similar things. Real embeddings live in hundreds of dimensions — this is a 2-D shadow.",
+      "Hover a word: nearby words mean similar things. Real embeddings live in hundreds of dimensions, this is a 2-D shadow.",
     ),
   )
 }
@@ -410,7 +410,7 @@ function mountGradientDescent(el: HTMLElement) {
     control,
     btn,
     canvas,
-    caption("The ball follows the slope downhill — that's training. Too big a learning rate and it overshoots or diverges."),
+    caption("The ball follows the slope downhill, that's training. Too big a learning rate and it overshoots or diverges."),
   )
   span.textContent = `Learning rate: ${parseFloat(slider.value).toFixed(2)}`
   start()
@@ -437,7 +437,7 @@ function mountAsk(el: HTMLElement) {
   form.append(input, btn)
 
   const status = caption(
-    "Semantic search over every note — the query and all notes are embedded by a model running in your browser, then ranked by meaning.",
+    "Semantic search over every note, the query and all notes are embedded by a model running in your browser, then ranked by meaning.",
   )
   const results = document.createElement("div")
   results.className = "ask-results"
@@ -480,7 +480,7 @@ function mountAsk(el: HTMLElement) {
         notes.push({ slug, title: d.title || slug, desc: (d.content || "").slice(0, 150), vec })
       }
       ready = true
-      status.textContent = "Ready — ask a question and I'll surface the closest notes by meaning."
+      status.textContent = "Ready, ask a question and I'll surface the closest notes by meaning."
       return true
     } catch {
       status.textContent =
@@ -535,7 +535,7 @@ function mountLlm(el: HTMLElement) {
     const setup = document.createElement("div")
     setup.className = "llm-setup"
     setup.innerHTML =
-      "<strong>Live model — needs a 30-second setup.</strong> This widget calls a real Claude model through a tiny proxy that keeps your API key server-side. " +
+      "<strong>Live model, needs a 30-second setup.</strong> This widget calls a real Claude model through a tiny proxy that keeps your API key server-side. " +
       "Deploy <code>serverless/llm-proxy.js</code> (a Cloudflare Worker) with your <code>ANTHROPIC_API_KEY</code>, then set the widget's endpoint: " +
       '<code>&lt;div class="explorable" data-explorable="llm" data-endpoint="https://your-worker.workers.dev"&gt;&lt;/div&gt;</code>'
     el.appendChild(setup)
@@ -575,7 +575,7 @@ function mountLlm(el: HTMLElement) {
       const text = ct.includes("application/json") ? (await res.json()).text ?? "" : await res.text()
       out.textContent = text || "(no output)"
     } catch {
-      out.textContent = "Request failed — check the endpoint and its CORS settings."
+      out.textContent = "Request failed, check the endpoint and its CORS settings."
     } finally {
       btn.disabled = false
     }
@@ -722,7 +722,7 @@ function mountGardenMap(el: HTMLElement) {
       const tagsOrdered = Array.from(freq.entries())
         .sort((a, b) => b[1] - a[1])
         .map((e) => e[0])
-      // muted earth-tone palette — distinct but harmonious in light + dark
+      // muted earth-tone palette, distinct but harmonious in light + dark
       const PALETTE = ["#c17d4a", "#8c6a48", "#a5563a", "#7e8248", "#5f8079", "#946a86", "#b58a3c", "#7a6a55"]
       const tagColor = new Map<string, string>()
       tagsOrdered.forEach((t, i) => tagColor.set(t, PALETTE[i % PALETTE.length]))
@@ -808,8 +808,8 @@ function mountGardenMap(el: HTMLElement) {
       holder.appendChild(legend)
 
       const nVisited = docs.filter((d) => visited.has(d.slug)).length
-      status.textContent = `Every note placed by meaning and coloured by topic — nearby dots share themes. Hover for a note's closest neighbours; click to open it.${
-        nVisited ? ` You've explored ${nVisited} of ${N} — those glow.` : ""
+      status.textContent = `Every note placed by meaning and coloured by topic, nearby dots share themes. Hover for a note's closest neighbours; click to open it.${
+        nVisited ? ` You've explored ${nVisited} of ${N}, those glow.` : ""
       }`
     })
     .catch(() => {
@@ -999,7 +999,7 @@ function mountLearn(el: HTMLElement) {
     bar,
     canvas,
     caption(
-      "Click to drop points of the selected class. A tiny neural network trains live and paints the boundary it has learned — add points and watch it adapt.",
+      "Click to drop points of the selected class. A tiny neural network trains live and paints the boundary it has learned, add points and watch it adapt.",
     ),
   )
   const sync = () => {
@@ -1192,7 +1192,7 @@ function mountTokenizeCard(el: HTMLElement) {
     ctx.fillText(`${toks.length} tokens · oliveaniss.xyz`, 60, H - 56)
   }
   const updateShare = () => {
-    const txt = `I tokenized "${input.value.slice(0, 80)}" — see how AI reads text:`
+    const txt = `I tokenized "${input.value.slice(0, 80)}", see how AI reads text:`
     sh.href = `https://x.com/intent/tweet?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(
       "https://oliveaniss.xyz/posts/tokens-the-atoms-of-llms",
     )}`
@@ -1318,9 +1318,9 @@ function mountCommits(el: HTMLElement) {
 
 // A practical tool: paste any text, get the exact token count from the real
 // GPT tokenizers (via gpt-tokenizer, loaded from a CDN) and an estimated cost
-// across models. Runs entirely in the browser — nothing is sent anywhere.
+// across models. Runs entirely in the browser, nothing is sent anywhere.
 function mountTokenCost(el: HTMLElement) {
-  // Prices are USD per 1,000,000 tokens — approximate; update here as needed.
+  // Prices are USD per 1,000,000 tokens, approximate; update here as needed.
   const MODELS: { label: string; count: "o200k" | "cl100k" | "estimate"; in: number; out: number }[] =
     [
       { label: "Claude 3.5 Sonnet", count: "estimate", in: 3, out: 15 },
@@ -1473,7 +1473,7 @@ function mountTokenCost(el: HTMLElement) {
 
     note.textContent =
       o.exact && c.exact
-        ? "GPT token counts are exact — from their real byte-pair tokenizer (gpt-tokenizer, running in your browser). Claude has no free browser tokenizer, so its rows (marked *) are estimated from the GPT-4o count and land within a few percent. Prices are approximate USD per 1M tokens. “·” marks a space."
+        ? "GPT token counts are exact, from their real byte-pair tokenizer (gpt-tokenizer, running in your browser). Claude has no free browser tokenizer, so its rows (marked *) are estimated from the GPT-4o count and land within a few percent. Prices are approximate USD per 1M tokens. “·” marks a space."
         : "Loading the real GPT tokenizers… showing an approximation (≈ characters ÷ 4). Values marked * are approximate."
   }
 
@@ -1488,136 +1488,134 @@ function mountTokenCost(el: HTMLElement) {
   ensure("cl100k")
 }
 
-// A boxed "Ask AI" assistant that answers right on the page. It calls a free,
-// keyless, CORS-open text model straight from the browser — no server, no login
-// — and streams the reply so it appears as it is written.
-function mountAskAi(el: HTMLElement) {
-  const SYSTEM =
-    "You are the friendly AI guide for an interactive 'Explorable AI' garden that explains how modern AI works (tokens, embeddings, attention, transformers, sampling, training). Explain clearly and simply, like a patient teacher, with short paragraphs and concrete analogies. If a question is unrelated, still help. Always reply in the same language the reader used."
-
-  const log = document.createElement("div")
-  log.className = "askai-log"
-  const form = document.createElement("form")
-  form.className = "askai-form"
-  const input = document.createElement("textarea")
-  input.className = "askai-input"
-  input.rows = 1
-  input.placeholder = "Ask anything about AI…"
-  const btn = document.createElement("button")
-  btn.type = "submit"
-  btn.className = "explorable-btn askai-send"
-  btn.textContent = "Ask"
-  form.append(input, btn)
-  const note = caption(
-    "A free AI assistant that runs entirely in your browser — no login, no key, nothing sent to any server. Your first question downloads the model once (a few hundred MB), then it works offline. Best on Chrome or Edge on a computer.",
-  )
-  el.append(log, form, note)
-
-  const history: { role: string; content: string }[] = [{ role: "system", content: SYSTEM }]
-  const bubble = (role: string, text: string) => {
-    const b = document.createElement("div")
-    b.className = "askai-msg askai-" + role
-    b.textContent = text
-    log.appendChild(b)
-    log.scrollTop = log.scrollHeight
-    return b
+// Tokenizer comparison: paste text and watch GPT-4o (o200k) and GPT-4/3.5
+// (cl100k) split it into tokens side by side, instant, all in the browser.
+function mountTokenCompare(el: HTMLElement) {
+  const URLS: Record<string, string> = {
+    o200k: "https://esm.sh/gpt-tokenizer@2.9.0/encoding/o200k_base",
+    cl100k: "https://esm.sh/gpt-tokenizer@2.9.0/encoding/cl100k_base",
   }
-  bubble(
-    "ai",
-    "Hi! Ask me anything about how AI works — attention, embeddings, tokens, training — and I'll explain it simply.",
-  )
-
-  // WebLLM runs the model on the visitor's own GPU — no key, no server. The
-  // weights download and cache once (a few hundred MB), then it works offline.
-  const MODEL = el.dataset.model || "Llama-3.2-1B-Instruct-q4f32_1-MLC"
-  let engine: any = null
-
-  const ensureEngine = async (onProgress: (msg: string) => void): Promise<any> => {
-    if (engine) return engine
-    if (!(navigator as any).gpu) {
-      throw new Error(
-        "this browser has no WebGPU — open the page in Chrome or Edge on a computer to use the in-browser AI",
-      )
-    }
-    const dynImport = new Function("u", "return import(u)") as (u: string) => Promise<any>
-    const webllm = await dynImport("https://esm.run/@mlc-ai/web-llm")
-    engine = await webllm.CreateMLCEngine(MODEL, {
-      initProgressCallback: (r: any) => onProgress(r.text || "loading the model…"),
-    })
-    return engine
-  }
-
-  let busy = false
-  const send = async (q: string) => {
-    q = q.trim()
-    if (busy || !q) return
-    busy = true
-    btn.disabled = true
-    input.value = ""
-    input.style.height = "auto"
-    bubble("user", q)
-    history.push({ role: "user", content: q })
-    const out = bubble("ai", "…")
-    out.classList.add("askai-typing")
-
-    try {
-      if (!engine) {
-        out.textContent = "Loading the AI model — this happens once, then it runs offline…"
-        await ensureEngine((msg) => {
-          out.textContent = msg
-          log.scrollTop = log.scrollHeight
-        })
-      }
-      out.textContent = ""
-      out.classList.remove("askai-typing")
-      const chunks = await engine.chat.completions.create({
-        messages: history.slice(-12),
-        stream: true,
-        temperature: 0.4,
-        max_tokens: 1024,
+  const enc: Record<string, any> = { o200k: null, cl100k: null }
+  const dec: Record<string, any> = { o200k: null, cl100k: null }
+  const loading: Record<string, boolean> = {}
+  const dynImport = new Function("u", "return import(u)") as (u: string) => Promise<any>
+  const ensure = (fam: string) => {
+    if (enc[fam] || loading[fam]) return
+    loading[fam] = true
+    dynImport(URLS[fam])
+      .then((m: any) => {
+        enc[fam] = m.encode ?? m.default?.encode ?? null
+        dec[fam] = m.decode ?? m.default?.decode ?? null
+        render()
       })
-      let acc = ""
-      for await (const chunk of chunks) {
-        const delta = chunk.choices?.[0]?.delta?.content || ""
-        if (delta) {
-          acc += delta
-          out.textContent = acc
-          log.scrollTop = log.scrollHeight
+      .catch(() => {
+        loading[fam] = false
+        render()
+      })
+  }
+
+  const input = document.createElement("textarea")
+  input.className = "explorable-input"
+  input.rows = 3
+  input.value = el.dataset.text || "unbelievable 🤯, GPT-4o costs $2.50 per 1M tokens."
+
+  const grid = document.createElement("div")
+  grid.className = "tcmp-grid"
+  const PANELS = [
+    { fam: "o200k", label: "GPT-4o · o200k" },
+    { fam: "cl100k", label: "GPT-4 / 3.5 · cl100k" },
+  ]
+  const panelEls = PANELS.map((p) => {
+    const wrap = document.createElement("div")
+    wrap.className = "tcmp-panel"
+    const head = document.createElement("div")
+    head.className = "tcmp-head"
+    const model = document.createElement("span")
+    model.className = "tcmp-model"
+    model.textContent = p.label
+    const count = document.createElement("span")
+    count.className = "tcmp-count"
+    count.textContent = "—"
+    head.append(model, count)
+    const chips = document.createElement("div")
+    chips.className = "token-chips tcmp-chips"
+    const sub = document.createElement("div")
+    sub.className = "tcmp-sub"
+    wrap.append(head, chips, sub)
+    grid.appendChild(wrap)
+    return { fam: p.fam, chips, sub, count }
+  })
+
+  const insight = caption("")
+  el.append(input, grid, insight)
+
+  const CAP = 300
+  const render = () => {
+    const text = input.value
+    const counts: Record<string, number | null> = { o200k: null, cl100k: null }
+    let anyApprox = false
+    panelEls.forEach((p) => {
+      const e = enc[p.fam]
+      p.chips.innerHTML = ""
+      if (e) {
+        const ids: number[] = text ? e(text) : []
+        counts[p.fam] = ids.length
+        ids.slice(0, CAP).forEach((id, i) => {
+          const chip = document.createElement("span")
+          chip.className = "token-chip"
+          chip.style.setProperty("--i", String(i % 6))
+          const s = dec[p.fam] ? dec[p.fam]([id]) : "?"
+          chip.textContent = s.replace(/ /g, "·").replace(/\n/g, "⏎").replace(/\t/g, "⇥")
+          p.chips.appendChild(chip)
+        })
+        if (ids.length > CAP) {
+          const m = document.createElement("span")
+          m.className = "tokcost-more"
+          m.textContent = `+${(ids.length - CAP).toLocaleString()} more`
+          p.chips.appendChild(m)
         }
+        const cpt = ids.length ? (text.length / ids.length).toFixed(2) : "—"
+        const words = (text.match(/\S+/g) || []).length
+        p.sub.textContent = `${words} words · ${cpt} chars/token`
+        p.count.textContent = ids.length.toLocaleString()
+      } else {
+        ensure(p.fam)
+        counts[p.fam] = Math.round(text.length / 4)
+        p.count.textContent = "…"
+        p.sub.textContent = "loading tokenizer…"
+        anyApprox = true
       }
-      if (!acc.trim()) throw new Error("the model returned an empty reply")
-      history.push({ role: "assistant", content: acc })
-    } catch (err) {
-      out.classList.remove("askai-typing")
-      out.textContent = "Sorry — " + ((err && (err as any).message) || "something went wrong") + "."
-    } finally {
-      busy = false
-      btn.disabled = false
-      input.focus()
+    })
+    const o = counts.o200k
+    const c = counts.cl100k
+    if (anyApprox) {
+      insight.textContent = "Loading the real GPT tokenizers…"
+    } else if (!text.trim()) {
+      insight.textContent = "Type or paste text to compare how each model tokenizes it."
+    } else if (o === c) {
+      insight.textContent = "Both tokenizers split this into the same number of tokens."
+    } else {
+      const fewer = (o as number) < (c as number) ? "GPT-4o (o200k)" : "GPT-4 (cl100k)"
+      const diff = Math.abs((o as number) - (c as number))
+      const pct = Math.round((diff / Math.max(o as number, c as number)) * 100)
+      insight.textContent = `${fewer} uses ${diff} fewer token${diff === 1 ? "" : "s"} here (~${pct}% leaner). Fewer tokens means lower cost and more room in the context window.`
     }
   }
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault()
-    send(input.value)
-  })
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      send(input.value)
-    }
-  })
-  // grow the input with its content, up to a cap
+  let t = 0
   input.addEventListener("input", () => {
-    input.style.height = "auto"
-    input.style.height = Math.min(input.scrollHeight, 140) + "px"
+    clearTimeout(t)
+    t = window.setTimeout(render, 120) as unknown as number
   })
+  render()
+  ensure("o200k")
+  ensure("cl100k")
 }
 
 const REGISTRY: Record<string, (el: HTMLElement) => void> = {
   tokenizer: mountTokenizer,
   "token-cost": mountTokenCost,
-  "ask-ai": mountAskAi,
+  "token-compare": mountTokenCompare,
   embeddings: mountEmbeddings,
   attention: mountAttention,
   temperature: mountTemperature,

@@ -58,6 +58,7 @@ export const sharedPageComponents: SharedLayout = {
     Component.Pwa(),
     Component.Explorables(),
     Component.GraphResources(),
+    Component.AiAssistant(),
   ],
   footer: Component.Footer({
     links: {

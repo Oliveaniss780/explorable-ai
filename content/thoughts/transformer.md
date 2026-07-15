@@ -9,4 +9,4 @@ The **transformer** is the neural-network architecture introduced in 2017's _Att
 
 A transformer stacks many attention layers, each refining the [[thoughts/embedding|embeddings]] into more context-aware representations, and finishes by producing a probability distribution over the next token (shaped by [[thoughts/softmax|softmax]] and [[thoughts/temperature|temperature]]).
 
-Its parallelism is what made training at massive scale practical — the reason [[thoughts/llm|LLMs]] exist. Explore it in [[posts/how-a-transformer-thinks|How a transformer thinks]].
+Its parallelism is what made training at massive scale practical, the reason [[thoughts/llm|LLMs]] exist. Explore it in [[posts/how-a-transformer-thinks|How a transformer thinks]].

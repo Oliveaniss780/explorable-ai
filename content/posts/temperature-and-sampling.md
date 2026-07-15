@@ -1,6 +1,6 @@
 ---
 title: "Temperature and the art of the next word"
-description: "A language model doesn't choose a word — it rolls weighted dice. Temperature loads them."
+description: "A language model doesn't choose a word, it rolls weighted dice. Temperature loads them."
 date: 2026-06-12
 tags:
   - explorable
@@ -19,11 +19,11 @@ Drag the slider. The bars are the model's confidence in each candidate next word
 
 ## Where the numbers come from
 
-The model outputs a raw score — a **logit** — for every token. Temperature divides every logit before the **[[thoughts/softmax|softmax]]** squashes them into probabilities:
+The model outputs a raw score (a **logit**) for every token. Temperature divides every logit before the **[[thoughts/softmax|softmax]]** squashes them into probabilities:
 
 $$p_i = \frac{e^{z_i / T}}{\sum_j e^{z_j / T}}$$
 
-Divide by a small `T` and differences get exaggerated (peaky). Divide by a large `T` and everything evens out (flat). Temperature never adds knowledge — it only reshapes the confidence the model already has.
+Divide by a small `T` and differences get exaggerated (peaky). Divide by a large `T` and everything evens out (flat). Temperature never adds knowledge, it only reshapes the confidence the model already has.
 
 ## Practical notes
 

@@ -8,7 +8,7 @@ _A running list of the tools I reach for. Inspired by [uses.tech](https://uses.t
 ## Making the explainers
 
 - **Visualizations:** hand-written SVG and `<canvas>`, driven by the site's theme variables so every widget flips with light/dark mode.
-- **This site:** [Quartz](https://github.com/Oliveaniss780/quartz) — a static-site generator for digital gardens. The interactive widgets are mounted from plain `<div>` placeholders dropped into Markdown.
+- **This site:** [Quartz](https://github.com/Oliveaniss780/quartz), a static-site generator for digital gardens. The interactive widgets are mounted from plain `<div>` placeholders dropped into Markdown.
 
 ## Writing & thinking
 
@@ -18,6 +18,6 @@ _A running list of the tools I reach for. Inspired by [uses.tech](https://uses.t
 ## Design language
 
 - **Type:** DM Serif Display (headings), Bricolage Grotesque (body), JetBrains Mono (code).
-- **Palette:** a two-ink letterpress scheme — deep navy + vermilion on warm paper, inverted to a cyanotype at night.
+- **Palette:** a two-ink letterpress scheme, deep navy + vermilion on warm paper, inverted to a cyanotype at night.
 
 _Have a tool for building explorables you think I'd love? Let me know._
