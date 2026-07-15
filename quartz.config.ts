@@ -14,7 +14,7 @@ const config: QuartzConfig = {
       provider: "plausible",
     },
     locale: "en-US",
-    baseUrl: "oliveaniss.xyz",
+    baseUrl: "explorable-ai.vercel.app",
     ignorePatterns: ["private", "templates"],
     defaultDateType: "created",
     theme: {

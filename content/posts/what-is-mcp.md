@@ -36,7 +36,7 @@ Before MCP, every AI app wired up every tool by hand. MCP makes tools **portable
 The diagram above is a simulation, but this garden runs a **real MCP server** too. You can plug it into your own AI and ask it directly. It exposes two tools (`search_notes`, `get_note`) and every note as a `note://` resource, over Streamable HTTP:
 
 ```
-https://my-web-seven-brown-60.vercel.app/api/mcp
+https://explorable-ai.vercel.app/api/mcp
 ```
 
 **Cursor** (and other clients that speak HTTP), add to `.cursor/mcp.json`:
@@ -45,7 +45,7 @@ https://my-web-seven-brown-60.vercel.app/api/mcp
 {
   "mcpServers": {
     "oliveaniss-garden": {
-      "url": "https://my-web-seven-brown-60.vercel.app/api/mcp"
+      "url": "https://explorable-ai.vercel.app/api/mcp"
     }
   }
 }
@@ -58,7 +58,7 @@ https://my-web-seven-brown-60.vercel.app/api/mcp
   "mcpServers": {
     "oliveaniss-garden": {
       "command": "npx",
-      "args": ["mcp-remote", "https://my-web-seven-brown-60.vercel.app/api/mcp"]
+      "args": ["mcp-remote", "https://explorable-ai.vercel.app/api/mcp"]
     }
   }
 }

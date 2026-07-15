@@ -9,7 +9,7 @@
 <p align="center"><em>One sentence through the whole model: tokens, embeddings, attention, and its guess at the next word. On the live site it recomputes as you type. Nothing here is a diagram, it is the thing itself.</em></p>
 
 <p align="center">
-  <a href="https://my-web-seven-brown-60.vercel.app"><b>Live demo</b></a>
+  <a href="https://explorable-ai.vercel.app"><b>Live demo</b></a>
   &nbsp;·&nbsp;
   <a href="https://github.com/Oliveaniss780/explorable-ai/generate"><b>Use this template</b></a>
   &nbsp;·&nbsp;
@@ -18,7 +18,7 @@
 
 Most explanations of machine learning hand you one of two things: a wall of equations, or a metaphor so loose it falls apart the moment you lean on it. I wanted a third option: pages you can poke at. Every idea here (tokens, embeddings, attention, sampling, training) comes with a small widget you can type into, drag, or watch run. Change the input and the whole thing recomputes in front of you.
 
-The site is live at **https://my-web-seven-brown-60.vercel.app**.
+The site is live at **https://explorable-ai.vercel.app**.
 
 ## Where to start
 
@@ -26,15 +26,15 @@ Five explainers build on one another, in the order a sentence travels through a 
 
 | # | Explainer | What you do |
 |---|---|---|
-| 1 | [The atoms of a model](https://my-web-seven-brown-60.vercel.app/posts/tokens-the-atoms-of-llms) | Watch your words dissolve into tokens |
-| 2 | [Embeddings, explained](https://my-web-seven-brown-60.vercel.app/posts/embeddings-explained) | See meaning turn into distance on a map |
-| 3 | [How a transformer thinks](https://my-web-seven-brown-60.vercel.app/posts/how-a-transformer-thinks) | Click a word and watch attention light up |
-| 4 | [Temperature and the next word](https://my-web-seven-brown-60.vercel.app/posts/temperature-and-sampling) | Load the model's dice and watch it get weird |
-| 5 | [Watch a model learn](https://my-web-seven-brown-60.vercel.app/posts/watch-a-model-learn) | Roll a ball downhill; that is training |
+| 1 | [The atoms of a model](https://explorable-ai.vercel.app/posts/tokens-the-atoms-of-llms) | Watch your words dissolve into tokens |
+| 2 | [Embeddings, explained](https://explorable-ai.vercel.app/posts/embeddings-explained) | See meaning turn into distance on a map |
+| 3 | [How a transformer thinks](https://explorable-ai.vercel.app/posts/how-a-transformer-thinks) | Click a word and watch attention light up |
+| 4 | [Temperature and the next word](https://explorable-ai.vercel.app/posts/temperature-and-sampling) | Load the model's dice and watch it get weird |
+| 5 | [Watch a model learn](https://explorable-ai.vercel.app/posts/watch-a-model-learn) | Roll a ball downhill; that is training |
 
-Want the big picture at once? [The whole model on one screen](https://my-web-seven-brown-60.vercel.app/posts/the-whole-model) runs every stage together for whatever sentence you type, and [teach a neuron](https://my-web-seven-brown-60.vercel.app/posts/teach-a-neuron) lets you draw your own data and watch a single unit try to fit it.
+Want the big picture at once? [The whole model on one screen](https://explorable-ai.vercel.app/posts/the-whole-model) runs every stage together for whatever sentence you type, and [teach a neuron](https://explorable-ai.vercel.app/posts/teach-a-neuron) lets you draw your own data and watch a single unit try to fit it.
 
-Around the essays sits a set of short [concept notes](https://my-web-seven-brown-60.vercel.app/thoughts/): a small, cross-linked encyclopedia of terms like attention, softmax, RAG, and context window. They are meant to be wandered, not read front to back. The home page opens on a force-directed graph of how they connect, plus a second map that places every note by *meaning* rather than by links.
+Around the essays sits a set of short [concept notes](https://explorable-ai.vercel.app/thoughts/): a small, cross-linked encyclopedia of terms like attention, softmax, RAG, and context window. They are meant to be wandered, not read front to back. The home page opens on a force-directed graph of how they connect, plus a second map that places every note by *meaning* rather than by links.
 
 ## The explorables
 
@@ -72,8 +72,8 @@ Beyond the explainers, a few practical tools run entirely in your browser (no se
 
 | Tool | What it does |
 |---|---|
-| [Token & cost calculator](https://my-web-seven-brown-60.vercel.app/tools/token-cost-calculator) | Paste any prompt, get exact token counts from the real GPT tokenizer, plus estimated cost across GPT-4o, GPT-4, and Claude |
-| [Tokenizer comparison](https://my-web-seven-brown-60.vercel.app/tools/tokenizer-comparison) | See how GPT-4o and GPT-4 chop the same text into tokens, side by side |
+| [Token & cost calculator](https://explorable-ai.vercel.app/tools/token-cost-calculator) | Paste any prompt, get exact token counts from the real GPT tokenizer, plus estimated cost across GPT-4o, GPT-4, and Claude |
+| [Tokenizer comparison](https://explorable-ai.vercel.app/tools/tokenizer-comparison) | See how GPT-4o and GPT-4 chop the same text into tokens, side by side |
 | **Ask AI** | A floating assistant on every page. It runs a small language model *entirely in your browser* (WebLLM / WebGPU), so there is no login and nothing you type leaves your device |
 
 ## Connect your AI over MCP
@@ -86,7 +86,7 @@ The garden also runs a real **MCP (Model Context Protocol) server**, so any MCP 
 | Tool | `get_note` | Read one note by its slug |
 | Resource | `note://<slug>` | Every note, as a readable resource |
 
-Point a client at `https://my-web-seven-brown-60.vercel.app/api/mcp`, then ask your assistant to *search the garden for attention*. There is a live walkthrough at [What is MCP?](https://my-web-seven-brown-60.vercel.app/posts/what-is-mcp).
+Point a client at `https://explorable-ai.vercel.app/api/mcp`, then ask your assistant to *search the garden for attention*. There is a live walkthrough at [What is MCP?](https://explorable-ai.vercel.app/posts/what-is-mcp).
 
 ## Look and feel
 
