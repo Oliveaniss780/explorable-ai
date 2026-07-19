@@ -32,6 +32,8 @@ import Explorables from "./Explorables"
 import SeriesNav from "./SeriesNav"
 import GraphResources from "./GraphResources"
 import AiAssistant from "./AiAssistant"
+import GrowthStage from "./GrowthStage"
+import RelatedNotes from "./RelatedNotes"
 
 export {
   ArticleTitle,
@@ -68,4 +70,6 @@ export {
   SeriesNav,
   GraphResources,
   AiAssistant,
+  GrowthStage,
+  RelatedNotes,
 }

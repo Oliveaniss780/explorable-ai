@@ -19,6 +19,7 @@ const defaultLinks: NavLink[] = [
   { title: "Home", dest: "/" as SimpleSlug, match: "index" },
   { title: "Writing", dest: "posts/" as SimpleSlug, match: "posts" },
   { title: "Thoughts", dest: "thoughts/" as SimpleSlug, match: "thoughts" },
+  { title: "Map", dest: "map" as SimpleSlug, match: "map" },
   { title: "Books", dest: "books" as SimpleSlug, match: "books" },
   { title: "Tags", dest: "tags/" as SimpleSlug, match: "tags" },
   { title: "Now", dest: "now" as SimpleSlug, match: "now" },

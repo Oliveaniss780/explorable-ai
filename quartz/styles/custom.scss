@@ -601,3 +601,32 @@ body.animation-ready #quartz-body {
     }
   }
 }
+
+// ── Obsidian callouts, tuned to the latte/cacao palette ──────────────────────
+// Collapse Quartz's default rainbow into the site's warm two-ink scheme:
+// caramel for neutral notes, amber for anything that wants attention.
+.callout {
+  &[data-callout] {
+    --color: var(--secondary);
+    --border: color-mix(in srgb, var(--secondary) 28%, transparent);
+    --bg: color-mix(in srgb, var(--secondary) 7%, transparent);
+  }
+
+  &[data-callout="tip"],
+  &[data-callout="hint"],
+  &[data-callout="success"],
+  &[data-callout="question"],
+  &[data-callout="help"],
+  &[data-callout="warning"],
+  &[data-callout="caution"],
+  &[data-callout="attention"],
+  &[data-callout="important"],
+  &[data-callout="danger"],
+  &[data-callout="error"],
+  &[data-callout="failure"],
+  &[data-callout="bug"] {
+    --color: var(--tertiary);
+    --border: color-mix(in srgb, var(--tertiary) 30%, transparent);
+    --bg: color-mix(in srgb, var(--tertiary) 8%, transparent);
+  }
+}

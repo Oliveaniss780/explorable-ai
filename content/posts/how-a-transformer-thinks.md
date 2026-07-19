@@ -18,6 +18,9 @@ Click any word in the sentence below. The other words darken in proportion to ho
 
 Click **it**. Notice that it lights up **cat**, the model has learned that the pronoun refers back to the cat, not the verb or the mood. This is _coreference_, and no one programmed it. It emerged from reading.
 
+> [!note] Nobody wrote a rule for this
+> No line of code says "it" refers to "cat". The link fell out of predicting the next word across billions of sentences. That is the quiet miracle of attention.
+
 ## What's actually happening
 
 Every token produces three vectors from its [[thoughts/embedding|embedding]]:

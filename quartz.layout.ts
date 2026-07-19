@@ -84,13 +84,25 @@ const left = [
 // components for pages that display a single page (e.g. a single note)
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
+    Component.Breadcrumbs(),
     Component.ReadingEnhancements(),
     Component.ArticleTitle(),
     Component.ContentMeta(),
+    Component.GrowthStage(),
     Component.TagList(),
   ],
   left,
-  right: [Component.DesktopOnly(Component.TableOfContents()), Component.Backlinks()],
+  right: [
+    Component.DesktopOnly(Component.TableOfContents()),
+    Component.DesktopOnly(
+      Component.ConditionalRender({
+        component: Component.Graph(),
+        condition: (props) => props.fileData.slug !== "index" && props.fileData.slug !== "map",
+      }),
+    ),
+    Component.Backlinks(),
+    Component.DesktopOnly(Component.RelatedNotes()),
+  ],
 }
 
 // components for pages that display lists of pages  (e.g. tags or folders)
