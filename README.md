@@ -122,7 +122,7 @@ You will need Node 22 or newer.
 
 ```bash
 npm install
-npx quartz build --serve
+npm run serve
 ```
 
 Then open http://localhost:8080. Edits under `content/` reload on save.
@@ -152,7 +152,7 @@ This repository is a template, so you can grow your own garden from it without t
 
 ### Deploying
 
-The one-click **Deploy with Vercel** button reads `vercel.json` for you (build with `npx quartz build`, output in `public/`, on Node 22) and wires up the repo. After that, every push to `main` rebuilds and redeploys automatically, and any other branch gets its own preview URL. The same static output works on Netlify, GitHub Pages, or any static host.
+The one-click **Deploy with Vercel** button reads `vercel.json` for you (build with `npm run build`, output in `public/`, on Node 22) and wires up the repo. After that, every push to `main` rebuilds and redeploys automatically, and any other branch gets its own preview URL. The same static output works on Netlify, GitHub Pages, or any static host.
 
 ## Credits
 
