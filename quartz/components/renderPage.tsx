@@ -266,28 +266,6 @@ export function renderPage(
                     beforeBody.map((BodyComponent) => <BodyComponent {...componentData} />)}
                 </div>
               </div>
-              {slug === "index" && (
-                <div class="graph-hero" aria-hidden="true">
-                  <div
-                    class="graph-container"
-                    data-cfg={JSON.stringify({
-                      drag: true,
-                      zoom: true,
-                      depth: -1,
-                      scale: 0.9,
-                      repelForce: 0.5,
-                      centerForce: 0.3,
-                      linkDistance: 30,
-                      fontSize: 0.55,
-                      opacityScale: 1,
-                      showTags: true,
-                      removeTags: [],
-                      focusOnHover: true,
-                      enableRadial: false,
-                    })}
-                  ></div>
-                </div>
-              )}
               <Content {...componentData} />
               <hr />
               <div class="page-footer">
