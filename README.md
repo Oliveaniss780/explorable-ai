@@ -114,7 +114,7 @@ Two warm, two-ink palettes: an oat-milk "latte" for day and a deep-espresso "cac
 | **WebLLM** | In-browser chat model behind the floating Ask AI assistant |
 | **Pixi / WebGL** | The home-page node graph |
 
-Most of the interactive widgets live in one file, `quartz/components/scripts/explorables.inline.ts`; the floating assistant is `quartz/components/scripts/aiAssistant.inline.ts`. The rest of `quartz/` is the engine.
+Most of the interactive widgets live in one script file; the floating assistant is another. Everything else is the static-site engine.
 
 ## Running it locally
 
@@ -135,11 +135,9 @@ content/            the garden itself: every note and essay, in Markdown
   thoughts/         short concept notes
   tools/            the browser tools (token calculator, tokenizer comparison)
 api/                serverless functions (the MCP server)
-quartz/             the static-site engine (Preact SSR + remark/rehype)
-  components/       page components and the explorable widgets
-quartz.config.ts    site config: theme, fonts, plugins
-quartz.layout.ts    what goes where on each page
 ```
+
+Everything else is the static-site engine and its config: the theme and fonts, the page components and explorable widgets, and the layout of each page.
 
 ## Make your own
 
@@ -147,8 +145,8 @@ This repository is a template, so you can grow your own garden from it without t
 
 1. **Start from it.** Click **[Use this template](https://github.com/Oliveaniss780/explorable-ai/generate)** for your own copy, or the **Deploy with Vercel** button above to get a live site in one step.
 2. **Write.** Everything the site shows lives in `content/` as Markdown. Delete mine and add yours; links between notes use `[[wikilink]]` syntax, and the graph builds itself from them.
-3. **Re-theme.** The two colour palettes and the three fonts are a few lines near the top of `quartz.config.ts`. Swap them and the whole site (and every widget) follows.
-4. **Add explorables.** Drop a placeholder like `<div class="explorable" data-explorable="attention"></div>` into any note. The widgets are all defined in `quartz/components/scripts/explorables.inline.ts`.
+3. **Re-theme.** The two colour palettes and the three fonts are a few lines near the top of the site config. Swap them and the whole site (and every widget) follows.
+4. **Add explorables.** Drop a placeholder like `<div class="explorable" data-explorable="attention"></div>` into any note. The widgets are all defined in one script file.
 
 ### Deploying
 
