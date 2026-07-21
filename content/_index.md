@@ -30,13 +30,9 @@ Or **ask the garden**, type a question and an embedding model running _in your b
 
 <div class="explorable" data-explorable="ask"></div>
 
-Prefer to wander? The [[thoughts/llm|concept notes]] are a linked encyclopedia of AI terms. Here is the graph of how they connect, drag it, zoom in, and click any node to open the note:
+Prefer to wander? The [[thoughts/llm|concept notes]] are a linked encyclopedia of AI terms. Start anywhere and follow the threads, or open the graph view.
 
-<div class="graph-hero" aria-hidden="true">
-  <div class="graph-container" data-cfg='{"drag":true,"zoom":true,"depth":-1,"scale":0.9,"repelForce":0.5,"centerForce":0.3,"linkDistance":30,"fontSize":0.55,"opacityScale":1,"showTags":true,"removeTags":[],"focusOnHover":true,"enableRadial":false}'></div>
-</div>
-
-Or explore the same garden **by meaning** instead of by links. This second map places every note by what it's _about_, a mini dimensionality-reduction of the garden itself. Hover a dot to see its closest kin; click to open it.
+Or explore the whole garden **by meaning**. The graph view links notes that _reference_ each other; this map places every note by what it's _about_, a mini dimensionality-reduction of the garden itself. Hover a dot to see its closest kin; click to open it.
 
 <div class="explorable" data-explorable="garden-map"></div>
 
