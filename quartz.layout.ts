@@ -36,24 +36,8 @@ export const sharedPageComponents: SharedLayout = {
   afterBody: [
     // the guided-path rail renders itself only on posts in the series
     Component.SeriesNav(),
-    // share + subscribe + comments live at the end of real articles only
+    // share buttons live at the end of real articles only
     Component.ConditionalRender({ component: Component.ShareButtons(), condition: isArticle }),
-    Component.ConditionalRender({ component: Component.Newsletter(), condition: isArticle }),
-    Component.ConditionalRender({
-      component: Component.Comments({
-        provider: "giscus",
-        options: {
-          // ⚠️ Replace with your own giscus repo values (https://giscus.app),
-          // then add `comments: true` to a note's frontmatter to enable it.
-          repo: "Oliveaniss/oliveaniss",
-          repoId: "",
-          category: "General",
-          categoryId: "",
-        },
-      }),
-      // gated on frontmatter so no broken giscus box renders until configured
-      condition: (props) => isArticle(props) && props.fileData.frontmatter?.comments === true,
-    }),
     ...recentNotes.map((c) => Component.MobileOnly(c)),
     Component.Pwa(),
     Component.Explorables(),

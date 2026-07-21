@@ -525,63 +525,6 @@ function mountAsk(el: HTMLElement) {
 }
 
 // ── 7. Live LLM playground ──────────────────────────────────────────────────
-// Talks to a real model through a small proxy you deploy (see serverless/
-// llm-proxy.js). The endpoint is read from data-endpoint; without it, the
-// widget explains how to wire one up instead of silently failing.
-function mountLlm(el: HTMLElement) {
-  const endpoint = el.dataset.endpoint || (window as any).__LLM_ENDPOINT || ""
-
-  if (!endpoint) {
-    const setup = document.createElement("div")
-    setup.className = "llm-setup"
-    setup.innerHTML =
-      "<strong>Live model, needs a 30-second setup.</strong> This widget calls a real Claude model through a tiny proxy that keeps your API key server-side. " +
-      "Deploy <code>serverless/llm-proxy.js</code> (a Cloudflare Worker) with your <code>ANTHROPIC_API_KEY</code>, then set the widget's endpoint: " +
-      '<code>&lt;div class="explorable" data-explorable="llm" data-endpoint="https://your-worker.workers.dev"&gt;&lt;/div&gt;</code>'
-    el.appendChild(setup)
-    return
-  }
-
-  const form = document.createElement("form")
-  form.className = "llm-form"
-  const input = document.createElement("textarea")
-  input.className = "explorable-input"
-  input.rows = 3
-  input.value = el.dataset.text || "Explain attention in one sentence."
-  const btn = document.createElement("button")
-  btn.type = "submit"
-  btn.className = "explorable-btn"
-  btn.textContent = "Generate"
-  form.append(input, btn)
-
-  const out = document.createElement("div")
-  out.className = "llm-output"
-  const note = caption("A real model responds. Output is generated, so it varies and can be wrong.")
-  el.append(form, out, note)
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault()
-    const prompt = input.value.trim()
-    if (!prompt) return
-    btn.disabled = true
-    out.textContent = "Thinking…"
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ prompt }),
-      })
-      const ct = res.headers.get("content-type") || ""
-      const text = ct.includes("application/json") ? (await res.json()).text ?? "" : await res.text()
-      out.textContent = text || "(no output)"
-    } catch {
-      out.textContent = "Request failed, check the endpoint and its CORS settings."
-    } finally {
-      btn.disabled = false
-    }
-  })
-}
-
 // ── 8. Garden map ────────────────────────────────────────────────────────────
 // A 2-D map of every note positioned by *meaning*, not links: TF-IDF vectors
 // reduced to 2 dimensions with classical MDS / PCA, entirely in the browser.
@@ -1922,7 +1865,6 @@ const REGISTRY: Record<string, (el: HTMLElement) => void> = {
   temperature: mountTemperature,
   "gradient-descent": mountGradientDescent,
   ask: mountAsk,
-  llm: mountLlm,
   "garden-map": mountGardenMap,
   pipeline: mountPipeline,
   learn: mountLearn,
