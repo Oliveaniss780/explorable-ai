@@ -57,7 +57,6 @@ export const sharedPageComponents: SharedLayout = {
     ...recentNotes.map((c) => Component.MobileOnly(c)),
     Component.Pwa(),
     Component.Explorables(),
-    Component.GraphResources(),
     Component.AiAssistant(),
   ],
   footer: Component.Footer({
@@ -94,12 +93,8 @@ export const defaultContentPageLayout: PageLayout = {
   left,
   right: [
     Component.DesktopOnly(Component.TableOfContents()),
-    Component.DesktopOnly(
-      Component.ConditionalRender({
-        component: Component.Graph(),
-        condition: (props) => props.fileData.slug !== "index" && props.fileData.slug !== "map",
-      }),
-    ),
+    // The only graph on the site is the interactive one on the home page;
+    // no per-article link-graph in the sidebar.
     Component.Backlinks(),
     Component.DesktopOnly(Component.RelatedNotes()),
   ],

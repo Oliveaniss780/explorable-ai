@@ -8,7 +8,11 @@ tags:
 Explorable AI.
 ```
 
-Welcome. This is where you **learn how modern AI works by playing with it**, not hype, not equations for their own sake, but ideas you can _touch_. Every explainer has a live widget: type into it, drag it, watch it learn. Stuck on anything? The **✦ Ask AI** button in the corner explains it right on the page, and there are free **[tools](/tools/)** you'll want to keep around.
+**Type a sentence and watch it travel through a language model**, tokens, embeddings, attention, and its guess at the next word, all recomputing as you type. Hover any token to trace it through every stage at once. Nothing below is a diagram; it is the thing running.
+
+<div class="explorable" data-explorable="pipeline" data-text="the cat sat on the"></div>
+
+That is the whole idea of this site: **learn how modern AI works by playing with it**, not hype, not equations for their own sake, but ideas you can _touch_. Every explainer has a live widget like the one above. Stuck on anything? The **✦ Ask AI** button in the corner explains it right on the page, and there are free **[tools](/tools/)** you'll want to keep around.
 
 Start with the five that build on each other:
 

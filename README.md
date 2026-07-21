@@ -1,12 +1,12 @@
 # Oliveaniss
 
-*An explorable garden about how modern AI actually works.*
+*Interactive explainers that compute how AI works, live in your browser.*
 
 <p align="center">
   <img src=".github/readme/pipeline.png" alt="One sentence traced through the whole model: tokens, embeddings, attention, and the next-word guess" width="560">
 </p>
 
-<p align="center"><em>One sentence through the whole model: tokens, embeddings, attention, and its guess at the next word. On the live site it recomputes as you type. Nothing here is a diagram, it is the thing itself.</em></p>
+<p align="center"><em>Type a sentence and watch it travel through the whole model: real GPT-4o tokens, then embeddings, attention, and its guess at the next word, all recomputing as you type. Hover any token to trace it through every stage at once. Nothing here is a diagram, it is the thing running.</em></p>
 
 <p align="center">
   <a href="https://explorable-ai.vercel.app"><b>Live demo</b></a>
@@ -48,7 +48,7 @@ One site-wide script finds every placeholder on a page and hydrates it into a li
 
 | Widget | What it does |
 |---|---|
-| **pipeline** | Type a sentence, watch token, embedding, attention, and next word light up in order |
+| **pipeline** | Type a sentence, watch real GPT-4o tokens flow through embedding, attention, and next word; hover any token to trace it through every stage at once |
 | **attention** | Click any word and see which other words it leans on |
 | **temperature** | Drag a slider, watch the next-word odds go from confident to chaotic |
 | **learn** / **gradient-descent** | Draw your own data, or roll a ball down a loss curve: that is training |

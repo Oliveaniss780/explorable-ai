@@ -822,40 +822,96 @@ function mountPipeline(el: HTMLElement) {
   const input = document.createElement("textarea")
   input.className = "explorable-input"
   input.rows = 2
-  input.value = el.dataset.text || "the cat sat"
+  input.value = el.dataset.text || "the cat sat on the"
   const stages = document.createElement("div")
   stages.className = "pipe-stages"
-  el.append(
-    input,
-    stages,
-    caption(
-      "A schematic of the whole flow: token → embedding → attention → next word. The shapes are real; the exact numbers are illustrative.",
-    ),
-  )
+  const cap = caption("")
+  el.append(input, stages, cap)
+
+  // Stage 1 uses the *real* GPT tokenizer once it loads; everything downstream
+  // is illustrative but structurally faithful. Trace one token through it all.
+  let realTokenize: ((t: string) => string[]) | null = null
+  let tokReal = false
+  const tokenize = (t: string): string[] => (realTokenize ? realTokenize(t) : approxTokens(t))
 
   const dot = (a: number[], b: number[]) => {
     let s = 0
     for (let i = 0; i < a.length; i++) s += a[i] * b[i]
     return s
   }
-  const mkStage = (name: string) => {
+  const disp = (t: string) => t.replace(/ /g, "·").replace(/\n/g, "⏎")
+  const mkStage = (name: string, hint: string) => {
     const s = document.createElement("div")
     s.className = "pipe-stage"
     const h = document.createElement("div")
     h.className = "pipe-stage-h"
     h.textContent = name
+    const sub = document.createElement("div")
+    sub.className = "pipe-stage-sub"
+    sub.textContent = hint
     const body = document.createElement("div")
     body.className = "pipe-stage-body"
-    s.append(h, body)
+    s.append(h, sub, body)
     stages.appendChild(s)
     return { s, body }
   }
-  const sTok = mkStage("1 · Tokens")
-  const sEmb = mkStage("2 · Embeddings")
-  const sAtt = mkStage("3 · Attention")
-  const sNext = mkStage("4 · Next word")
-  const CAND = ["the", "a", "cat", "dog", "sat", "ran", "is", "on", "mat", "and", "quietly", "then"]
+  const sTok = mkStage("1 · Tokens", "the pieces the model actually reads")
+  const sEmb = mkStage("2 · Embeddings", "each token becomes a vector of numbers")
+  const sAtt = mkStage("3 · Attention", "every token weighs the ones before it")
+  const sNext = mkStage("4 · Next word", "the last token votes on what comes next")
+  const CAND = ["the", "a", "cat", "dog", "sat", "ran", "is", "on", "mat", "and", "quietly", "then", "floor", "there"]
 
+  // ── trace state: hover = temporary highlight, click = pinned ─────────────────
+  let clickPin = -1
+  let hover = -1
+  const activeTrace = () => (hover >= 0 ? hover : clickPin)
+  const refreshTrace = () => applyTrace(activeTrace())
+  let refs = {
+    n: 0,
+    chips: [] as HTMLElement[],
+    embRows: [] as HTMLElement[],
+    rowLabels: [] as HTMLElement[],
+    colHeads: [] as HTMLElement[],
+    cells: [] as HTMLElement[][], // cells[query][key]
+  }
+
+  const applyTrace = (i: number) => {
+    const on = i >= 0 && i < refs.n
+    for (let k = 0; k < refs.n; k++) {
+      const isQ = on && k === i
+      refs.chips[k]?.classList.toggle("trace", isQ)
+      refs.chips[k]?.classList.toggle("dim", on && !isQ)
+      refs.embRows[k]?.classList.toggle("trace", isQ)
+      refs.embRows[k]?.classList.toggle("dim", on && !isQ)
+      refs.rowLabels[k]?.classList.toggle("trace", isQ)
+      refs.rowLabels[k]?.classList.toggle("dim", on && !isQ)
+      refs.colHeads[k]?.classList.toggle("trace", on && k === i)
+    }
+    // attention: row i = what this token looks at (query); col i = who looks at it (key)
+    for (let q = 0; q < refs.n; q++) {
+      for (let key = 0; key < refs.n; key++) {
+        const cell = refs.cells[q]?.[key]
+        if (!cell) continue
+        cell.classList.toggle("trace", on && q === i)
+        cell.classList.toggle("trace-col", on && key === i && q !== i)
+        cell.classList.toggle("dim", on && q !== i && key !== i)
+      }
+    }
+    // next word is produced by the final token
+    sNext.s.classList.toggle("trace", on && i === refs.n - 1)
+    sNext.s.classList.toggle("dim", on && i !== refs.n - 1)
+    stages.classList.toggle("tracing", on)
+    if (on) {
+      const last = i === refs.n - 1
+      cap.textContent = last
+        ? `Tracing “${disp(refs.chips[i].dataset.tok || "")}” — the final token. Its embedding is the query, its attention row shows what it leans on, and it is the token that votes on the next word.`
+        : `Tracing “${disp(refs.chips[i].dataset.tok || "")}”. Row = what it attends to; column = which later tokens attend back to it. The next word is always predicted from the final token.`
+    } else {
+      cap.textContent = tokReal
+        ? "Real GPT-4o tokens. Hover any token to trace it through the whole model. The internal numbers are illustrative; the shapes, the tokens, and the flow are real."
+        : "Loading the real GPT-4o tokenizer… Hover any token to trace it through the whole model. Internal numbers are illustrative; the flow is real."
+    }
+  }
   let animTimer = 0
   const animate = () => {
     const order = [sTok.s, sEmb.s, sAtt.s, sNext.s]
@@ -871,26 +927,44 @@ function mountPipeline(el: HTMLElement) {
   }
 
   const render = () => {
-    const toks = approxTokens(input.value).slice(0, 8)
+    const toks = tokenize(input.value).slice(0, 8)
     if (toks.length === 0) return
     const vecs = toks.map((t) => tokenVec(t, 8))
+    refs = { n: toks.length, chips: [], embRows: [], rowLabels: [], colHeads: [], cells: [] }
 
+    // stage 1 · tokens (interactive)
     sTok.body.innerHTML = ""
     toks.forEach((t, i) => {
       const c = document.createElement("span")
-      c.className = "token-chip"
+      c.className = "token-chip token-chip--trace"
       c.style.setProperty("--i", String(i % 6))
-      c.textContent = t
+      c.textContent = disp(t)
+      c.dataset.tok = t
+      c.addEventListener("mouseenter", () => {
+        hover = i
+        refreshTrace()
+      })
+      c.addEventListener("click", () => {
+        clickPin = clickPin === i ? -1 : i
+        hover = -1
+        refreshTrace()
+      })
+      refs.chips.push(c)
       sTok.body.appendChild(c)
     })
 
+    // stage 2 · embeddings
     sEmb.body.innerHTML = ""
     toks.forEach((t, i) => {
       const row = document.createElement("div")
       row.className = "emb-row"
+      row.addEventListener("mouseenter", () => {
+        hover = i
+        refreshTrace()
+      })
       const lab = document.createElement("span")
       lab.className = "emb-row-lab"
-      lab.textContent = t
+      lab.textContent = disp(t)
       row.appendChild(lab)
       vecs[i].forEach((x) => {
         const cell = document.createElement("span")
@@ -899,9 +973,11 @@ function mountPipeline(el: HTMLElement) {
           x >= 0 ? rgba(cssVar("--tertiary"), Math.abs(x)) : rgba(cssVar("--secondary"), Math.abs(x))
         row.appendChild(cell)
       })
+      refs.embRows.push(row)
       sEmb.body.appendChild(row)
     })
 
+    // stage 3 · attention (row = query, col = key)
     sAtt.body.innerHTML = ""
     const grid = document.createElement("div")
     grid.className = "attn-grid"
@@ -910,27 +986,37 @@ function mountPipeline(el: HTMLElement) {
     toks.forEach((t) => {
       const h = document.createElement("span")
       h.className = "attn-h"
-      h.textContent = t
+      h.textContent = disp(t)
+      refs.colHeads.push(h)
       grid.appendChild(h)
     })
     toks.forEach((_, i) => {
       const rl = document.createElement("span")
       rl.className = "attn-h attn-rl"
-      rl.textContent = toks[i]
+      rl.textContent = disp(toks[i])
+      rl.addEventListener("mouseenter", () => {
+        hover = i
+        refreshTrace()
+      })
+      refs.rowLabels.push(rl)
       grid.appendChild(rl)
       const logits = toks.map((__, j) => (j <= i ? dot(vecs[i], vecs[j]) * 3 : -1e9))
       const mx = Math.max(...logits)
       const ex = logits.map((l) => Math.exp(l - mx))
       const sum = ex.reduce((a, b) => a + b, 0)
+      const rowCells: HTMLElement[] = []
       ex.forEach((e, j) => {
         const cell = document.createElement("span")
         cell.className = "attn-cell"
         cell.style.backgroundColor = rgba(cssVar("--tertiary"), j <= i ? Math.min(1, e / sum) : 0)
+        rowCells.push(cell)
         grid.appendChild(cell)
       })
+      refs.cells.push(rowCells)
     })
     sAtt.body.appendChild(grid)
 
+    // stage 4 · next word (predicted from the final token)
     sNext.body.innerHTML = ""
     const last = vecs[vecs.length - 1]
     const logs = CAND.map((c) => dot(last, tokenVec(c, 8)) * 4)
@@ -959,10 +1045,39 @@ function mountPipeline(el: HTMLElement) {
         sNext.body.appendChild(r)
       })
 
-    animate()
+    const act = activeTrace()
+    if (act >= 0 && act < toks.length) {
+      applyTrace(act)
+    } else {
+      clickPin = -1
+      hover = -1
+      applyTrace(-1)
+      animate()
+    }
   }
+
+  stages.addEventListener("mouseleave", () => {
+    hover = -1
+    refreshTrace()
+  })
   input.addEventListener("input", render)
   render()
+
+  // lazy-load the real GPT-4o tokenizer, then re-render stage 1 for real
+  const dynImport = new Function("u", "return import(u)") as (u: string) => Promise<any>
+  dynImport("https://esm.sh/gpt-tokenizer@2.9.0/encoding/o200k_base")
+    .then((mod: any) => {
+      const encode = mod.encode ?? mod.default?.encode
+      const decode = mod.decode ?? mod.default?.decode
+      if (!encode || !decode) throw new Error("no encode/decode")
+      realTokenize = (text: string) => (text ? encode(text).map((id: number) => decode([id])) : [])
+      tokReal = true
+      render()
+    })
+    .catch(() => {
+      render()
+    })
+
   window.addCleanup(() => clearInterval(animTimer))
 }
 

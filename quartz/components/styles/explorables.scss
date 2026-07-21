@@ -426,7 +426,65 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--gray);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+
+.pipe-stage-sub {
+  font-family: var(--bodyFont);
+  font-size: 0.72rem;
+  color: var(--gray);
+  opacity: 0.8;
+  margin-bottom: 0.55rem;
+}
+
+// ── cross-stage tracing: hover a token, watch it light up everywhere ──────────
+.pipe-stages.tracing .pipe-stage:not(.trace):not(.lit) {
+  border-left-color: var(--lightgray);
+}
+.pipe-stage.trace {
+  border-left-color: var(--secondary);
+  background-color: color-mix(in srgb, var(--secondary) 8%, var(--light));
+}
+
+.token-chip--trace {
+  cursor: pointer;
+}
+.token-chip.trace {
+  outline: 2px solid var(--secondary);
+  outline-offset: 1px;
+  font-weight: 700;
+}
+
+.emb-row,
+.attn-rl {
+  cursor: pointer;
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
+}
+.emb-row.trace .emb-row-lab,
+.attn-h.trace {
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+// dim everything that is not on the traced path
+.token-chip.dim,
+.emb-row.dim,
+.attn-cell.dim,
+.attn-h.dim,
+.pipe-stage.dim {
+  opacity: 0.24;
+}
+
+// the traced query row and the key column that attends back
+.attn-cell.trace {
+  outline: 1.5px solid var(--secondary);
+  outline-offset: -1.5px;
+}
+.attn-cell.trace-col {
+  outline: 1.5px solid color-mix(in srgb, var(--secondary) 55%, transparent);
+  outline-offset: -1.5px;
 }
 
 .pipe-stage-body {
