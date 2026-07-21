@@ -57,6 +57,10 @@ export const sharedPageComponents: SharedLayout = {
     ...recentNotes.map((c) => Component.MobileOnly(c)),
     Component.Pwa(),
     Component.Explorables(),
+    // Needed by the force-directed hero graph on the home page (renderPage.tsx,
+    // rendered only when slug === "index"). The per-article sidebar graph is
+    // gone, so this script simply finds no container to draw into elsewhere.
+    Component.GraphResources(),
     Component.AiAssistant(),
   ],
   footer: Component.Footer({
