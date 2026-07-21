@@ -7,7 +7,7 @@ A colophon is a note on how a thing was made. Here's how this garden grows.
 
 ## Built with
 
-- **Quartz**, a static-site generator that turns a folder of Markdown into a linked website.
+- A **custom static-site generator** that turns a folder of Markdown into a linked website.
 - **Preact** for templating, rendered to static HTML at build time.
 - **unified / remark / rehype** for the Markdown → HTML pipeline.
 

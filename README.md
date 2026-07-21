@@ -107,7 +107,7 @@ Two warm, two-ink palettes: an oat-milk "latte" for day and a deep-espresso "cac
 
 | Piece | Role |
 |---|---|
-| **Quartz** | Static-site generator that turns a folder of Markdown into a linked website (MIT-licensed, heavily customised here) |
+| **Static-site engine** | A heavily customised open-source static-site generator (MIT) that turns a folder of Markdown into a linked website |
 | **Preact** | Rendered to static HTML at build time |
 | **unified / remark / rehype** | The Markdown-to-HTML pipeline, with KaTeX for maths and Shiki for syntax highlighting |
 | **Transformers.js** | In-browser embedding model behind "ask the garden" and the meaning-map |
@@ -156,4 +156,4 @@ The one-click **Deploy with Vercel** button reads `vercel.json` for you (build w
 
 ## Credits
 
-Built on the Quartz static-site generator, which is MIT-licensed; that licence and its original copyright are preserved in `LICENSE.txt`. Everything under `content/` (the writing, the widget designs, the palette) is mine.
+Built on an open-source static-site generator (MIT); its licence is preserved in `LICENSE.txt`. Everything under `content/` (the writing, the widget designs, the palette) is mine.
