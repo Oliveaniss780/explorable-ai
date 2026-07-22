@@ -53,6 +53,19 @@ const tokenVec = (tok: string, d = 8): number[] => {
   return v.map((x) => x / norm)
 }
 
+// Shared, lazily-loaded sentence-embedding model (MiniLM) running in the browser
+// via Transformers.js. Cached across widgets so it only loads once per page.
+let _embedderPromise: Promise<(t: string, o?: any) => Promise<{ data: Float32Array }>> | null = null
+function getEmbedder() {
+  if (!_embedderPromise) {
+    const dynImport = new Function("u", "return import(u)") as (u: string) => Promise<any>
+    _embedderPromise = dynImport("https://esm.sh/@xenova/transformers@2.17.2").then((t: any) =>
+      t.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2"),
+    )
+  }
+  return _embedderPromise
+}
+
 function caption(text: string) {
   const p = document.createElement("p")
   p.className = "explorable-note"
@@ -777,6 +790,13 @@ function mountPipeline(el: HTMLElement) {
   let tokReal = false
   const tokenize = (t: string): string[] => (realTokenize ? realTokenize(t) : approxTokens(t))
 
+  // Stages 2 and 3 use *real* embeddings from a model in the browser once it
+  // loads; until then a deterministic hash stands in so the widget works
+  // instantly. Stage 4 stays an explicit illustration.
+  let embReal = false
+  let embVecs: number[][] | null = null
+  let embSeq = 0
+
   const dot = (a: number[], b: number[]) => {
     let s = 0
     for (let i = 0; i < a.length; i++) s += a[i] * b[i]
@@ -850,9 +870,10 @@ function mountPipeline(el: HTMLElement) {
         ? `Tracing “${disp(refs.chips[i].dataset.tok || "")}” — the final token. Its embedding is the query, its attention row shows what it leans on, and it is the token that votes on the next word.`
         : `Tracing “${disp(refs.chips[i].dataset.tok || "")}”. Row = what it attends to; column = which later tokens attend back to it. The next word is always predicted from the final token.`
     } else {
-      cap.textContent = tokReal
-        ? "Real GPT-4o tokens. Hover any token to trace it through the whole model. The internal numbers are illustrative; the shapes, the tokens, and the flow are real."
-        : "Loading the real GPT-4o tokenizer… Hover any token to trace it through the whole model. Internal numbers are illustrative; the flow is real."
+      const embMsg = embReal
+        ? "Tokens and embeddings are real: the GPT-4o tokenizer, and a MiniLM model running in your browser. Attention is their real cosine similarity. Only the next-word step is an illustration."
+        : "Loading a real embedding model… tokens are already real; embeddings use a stand-in until it loads."
+      cap.textContent = `Hover any token to trace it through the model. ${embMsg}`
     }
   }
   let animTimer = 0
@@ -872,7 +893,10 @@ function mountPipeline(el: HTMLElement) {
   const render = () => {
     const toks = tokenize(input.value).slice(0, 8)
     if (toks.length === 0) return
-    const vecs = toks.map((t) => tokenVec(t, 8))
+    // real embeddings if they match the current tokens, else the hash stand-in
+    const real = !!(embVecs && embVecs.length === toks.length)
+    const vecs = real ? (embVecs as number[][]) : toks.map((t) => tokenVec(t, 8))
+    const attnScale = real ? 8 : 3
     refs = { n: toks.length, chips: [], embRows: [], rowLabels: [], colHeads: [], cells: [] }
 
     // stage 1 · tokens (interactive)
@@ -909,7 +933,7 @@ function mountPipeline(el: HTMLElement) {
       lab.className = "emb-row-lab"
       lab.textContent = disp(t)
       row.appendChild(lab)
-      vecs[i].forEach((x) => {
+      vecs[i].slice(0, 24).forEach((x) => {
         const cell = document.createElement("span")
         cell.className = "emb-cell"
         cell.style.backgroundColor =
@@ -943,7 +967,7 @@ function mountPipeline(el: HTMLElement) {
       })
       refs.rowLabels.push(rl)
       grid.appendChild(rl)
-      const logits = toks.map((__, j) => (j <= i ? dot(vecs[i], vecs[j]) * 3 : -1e9))
+      const logits = toks.map((__, j) => (j <= i ? dot(vecs[i], vecs[j]) * attnScale : -1e9))
       const mx = Math.max(...logits)
       const ex = logits.map((l) => Math.exp(l - mx))
       const sum = ex.reduce((a, b) => a + b, 0)
@@ -959,9 +983,11 @@ function mountPipeline(el: HTMLElement) {
     })
     sAtt.body.appendChild(grid)
 
-    // stage 4 · next word (predicted from the final token)
+    // stage 4 · next word: an explicit stand-in (a hash predictor, independent
+    // of the real embeddings above). Real next-token prediction needs a full
+    // generative model, which is what the floating "Ask AI" box runs.
     sNext.body.innerHTML = ""
-    const last = vecs[vecs.length - 1]
+    const last = tokenVec(toks[toks.length - 1], 8)
     const logs = CAND.map((c) => dot(last, tokenVec(c, 8)) * 4)
     const mx = Math.max(...logs)
     const ex = logs.map((l) => Math.exp(l - mx))
@@ -1003,8 +1029,38 @@ function mountPipeline(el: HTMLElement) {
     hover = -1
     refreshTrace()
   })
-  input.addEventListener("input", render)
+  // embed the current tokens with the real model, then re-render for real
+  let embTimer = 0
+  const embedTokens = async () => {
+    const toks = tokenize(input.value).slice(0, 8)
+    if (!toks.length) return
+    const seq = ++embSeq
+    try {
+      const emb = await getEmbedder()
+      const vs: number[][] = []
+      for (const t of toks) {
+        const out = await emb((t.trim() || t).toLowerCase(), { pooling: "mean", normalize: true })
+        vs.push(Array.from(out.data as Float32Array))
+      }
+      if (seq !== embSeq) return // a newer edit superseded this batch
+      embVecs = vs
+      embReal = true
+      render()
+    } catch {
+      /* keep the hash fallback */
+    }
+  }
+  const scheduleEmbed = () => {
+    clearTimeout(embTimer)
+    embTimer = window.setTimeout(embedTokens, 300)
+  }
+
+  input.addEventListener("input", () => {
+    render()
+    scheduleEmbed()
+  })
   render()
+  scheduleEmbed()
 
   // lazy-load the real GPT-4o tokenizer, then re-render stage 1 for real
   const dynImport = new Function("u", "return import(u)") as (u: string) => Promise<any>
@@ -1016,12 +1072,16 @@ function mountPipeline(el: HTMLElement) {
       realTokenize = (text: string) => (text ? encode(text).map((id: number) => decode([id])) : [])
       tokReal = true
       render()
+      scheduleEmbed()
     })
     .catch(() => {
       render()
     })
 
-  window.addCleanup(() => clearInterval(animTimer))
+  window.addCleanup(() => {
+    clearInterval(animTimer)
+    clearTimeout(embTimer)
+  })
 }
 
 // ── 10. Teach a neuron (draw your own data) ──────────────────────────────────
