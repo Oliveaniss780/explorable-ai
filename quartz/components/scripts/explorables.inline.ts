@@ -549,7 +549,7 @@ const STOP = new Set(
 )
 
 function mountGardenMap(el: HTMLElement) {
-  const status = caption("Mapping the garden by meaning…")
+  const status = caption("Mapping these notes by meaning…")
   const holder = document.createElement("div")
   holder.className = "gmap-holder"
   el.append(holder, status)

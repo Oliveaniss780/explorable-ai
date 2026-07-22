@@ -8,35 +8,33 @@ tags:
 Explorable AI.
 ```
 
-**Type a sentence and watch it travel through a language model**, tokens, embeddings, attention, and its guess at the next word, all recomputing as you type. Hover any token to trace it through every stage at once. Nothing below is a diagram; it is the thing running.
+Type a sentence below and watch it move through a language model, one stage at a time: it splits into tokens, each token becomes a vector, the vectors weigh each other up (attention), and the model picks what comes next. It recomputes as you type, and you can hover a token to follow it through every stage.
 
 <div class="explorable" data-explorable="pipeline" data-text="the cat sat on the"></div>
 
-That is the whole idea of this site: **learn how modern AI works by playing with it**, not hype, not equations for their own sake, but ideas you can _touch_. Every explainer has a live widget like the one above. Stuck on anything? The **✦ Ask AI** button in the corner explains it right on the page, and there are free **[tools](/tools/)** you'll want to keep around.
+The tokens and embeddings above are real: the GPT-4o tokenizer, and a small embedding model, both running in your browser. The next-word step is a stand-in, real prediction needs a full model (that is what the assistant in the corner runs).
 
-Start with the five that build on each other:
+Every explainer here works the same way: a short explanation next to something you can change. Five of them build on each other, in the order a sentence moves through a model:
 
-- **[The atoms of a model](/posts/tokens-the-atoms-of-llms)**, watch your words dissolve into [[thoughts/token|tokens]].
+- **[The atoms of a model](/posts/tokens-the-atoms-of-llms)**, watch your words split into [[thoughts/token|tokens]].
 - **[Embeddings, explained](/posts/embeddings-explained)**, where meaning becomes distance on a map.
 - **[How a transformer thinks](/posts/how-a-transformer-thinks)**, click a word and see [[thoughts/attention|attention]] light up.
-- **[Temperature and the next word](/posts/temperature-and-sampling)**, load the model's dice and watch it get weird.
-- **[Watch a model learn](/posts/watch-a-model-learn)**, roll the ball downhill; that's training.
+- **[Temperature and the next word](/posts/temperature-and-sampling)**, change how random the model's choices are.
+- **[Watch a model learn](/posts/watch-a-model-learn)**, roll a ball downhill, which is roughly what training is.
 
-Want the big picture first? **[See the whole model on one screen](/posts/the-whole-model)** (every stage lit up at once) or **[teach a neuron](/posts/teach-a-neuron)** by drawing your own data.
+For the whole thing at once, see **[the whole model on one screen](/posts/the-whole-model)**, or **[teach a neuron](/posts/teach-a-neuron)** by drawing your own data.
 
-Building with the API? The **[token & cost calculator](/tools/token-cost-calculator)** counts any prompt exactly (using each model's real tokenizer) and estimates what a call costs across models. It runs entirely in your browser.
+There are also two browser tools: a **[token and cost calculator](/tools/token-cost-calculator)** that counts any prompt with each model's real tokenizer and estimates the cost, and a **[tokenizer comparison](/tools/tokenizer-comparison)**.
 
-Or **ask the garden**, type a question and an embedding model running _in your browser_ finds the notes closest in meaning (a live [[thoughts/rag|RAG]] demo):
+You can also search these notes by meaning: type a question and an embedding model in your browser finds the closest ones (a small [[thoughts/rag|RAG]] demo).
 
 <div class="explorable" data-explorable="ask"></div>
 
-Prefer to wander? The [[thoughts/llm|concept notes]] are a linked encyclopedia of AI terms. Start anywhere and follow the threads, or open the graph view.
-
-Or explore the whole garden **by meaning**. The graph view links notes that _reference_ each other; this map places every note by what it's _about_, a mini dimensionality-reduction of the garden itself. Hover a dot to see its closest kin; click to open it.
+The [[thoughts/llm|concept notes]] are a small linked encyclopedia of AI terms. The graph at the top links notes that reference each other; the map below instead places every note by what it is _about_, reduced to two dimensions. Hover a dot for its nearest neighbours, click to open it.
 
 <div class="explorable" data-explorable="garden-map"></div>
 
-And here's the garden being tended, my commits over the last year, pulled live from GitHub:
+And my GitHub commits over the last year, pulled in live:
 
 <div class="explorable" data-explorable="commits" data-user="Oliveaniss780"></div>
 
