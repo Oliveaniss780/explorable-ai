@@ -779,10 +779,30 @@ function mountPipeline(el: HTMLElement) {
   input.className = "explorable-input"
   input.rows = 2
   input.value = el.dataset.text || "the cat sat on the"
+  input.setAttribute("aria-label", "Type a sentence to run through the model")
+  input.title = "Type a sentence"
+  // let a specific sentence be shared via ?s=… so people can link their trace
+  const shared = new URLSearchParams(location.search).get("s")
+  if (shared) input.value = shared.slice(0, 200)
   const stages = document.createElement("div")
   stages.className = "pipe-stages"
   const cap = caption("")
-  el.append(input, stages, cap)
+  const share = document.createElement("button")
+  share.type = "button"
+  share.className = "explorable-btn pipe-share"
+  const SHARE_LABEL = "Copy a link to this sentence"
+  share.textContent = SHARE_LABEL
+  share.addEventListener("click", async () => {
+    const url = `${location.origin}${location.pathname}?s=${encodeURIComponent(input.value.slice(0, 200))}`
+    try {
+      await navigator.clipboard.writeText(url)
+      share.textContent = "Link copied"
+    } catch {
+      share.textContent = "Copy failed"
+    }
+    window.setTimeout(() => (share.textContent = SHARE_LABEL), 1800)
+  })
+  el.append(input, stages, cap, share)
 
   // Stage 1 uses the *real* GPT tokenizer once it loads; everything downstream
   // is illustrative but structurally faithful. Trace one token through it all.
@@ -878,6 +898,8 @@ function mountPipeline(el: HTMLElement) {
   }
   let animTimer = 0
   const animate = () => {
+    // respect users who prefer reduced motion: skip the stage sweep entirely
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
     const order = [sTok.s, sEmb.s, sAtt.s, sNext.s]
     order.forEach((s) => s.classList.remove("lit"))
     let k = 0
@@ -1060,7 +1082,11 @@ function mountPipeline(el: HTMLElement) {
     scheduleEmbed()
   })
   render()
-  scheduleEmbed()
+  // defer the ~20 MB embedding model to browser-idle so it never competes with
+  // first paint; typing kicks it off sooner if the reader gets there first
+  const idle =
+    (window as any).requestIdleCallback || ((f: () => void) => window.setTimeout(f, 1200))
+  idle(() => scheduleEmbed())
 
   // lazy-load the real GPT-4o tokenizer, then re-render stage 1 for real
   const dynImport = new Function("u", "return import(u)") as (u: string) => Promise<any>

@@ -437,6 +437,11 @@
   margin-bottom: 0.55rem;
 }
 
+.pipe-share {
+  margin-top: 0.7rem;
+  font-size: 0.72rem;
+}
+
 // ── cross-stage tracing: hover a token, watch it light up everywhere ──────────
 .pipe-stages.tracing .pipe-stage:not(.trace):not(.lit) {
   border-left-color: var(--lightgray);
@@ -742,6 +747,30 @@ a.card-share {
 @media (max-width: 600px) {
   .tcmp-grid {
     grid-template-columns: 1fr;
+  }
+
+  // pipeline / embeddings: let the fingerprint shrink instead of overflowing
+  .emb-cell {
+    min-width: 4px;
+  }
+  .emb-row-lab {
+    flex-basis: 2.6rem;
+    font-size: 0.66rem;
+  }
+  .attn-grid .attn-h {
+    font-size: 0.5rem;
+  }
+  .attn-cell {
+    height: 18px;
+  }
+  .pipe-stage {
+    padding: 0.6rem 0.7rem;
+  }
+  .pipe-stage-sub {
+    font-size: 0.68rem;
+  }
+  .token-chip {
+    font-size: 0.74rem;
   }
 }
 
