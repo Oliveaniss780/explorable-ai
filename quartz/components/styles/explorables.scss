@@ -145,6 +145,25 @@
   }
 }
 
+// the reader's own placed word: ringed dot, emphasised label
+.emb-user circle {
+  stroke: var(--secondary);
+  stroke-width: 2;
+}
+.emb-user .emb-label {
+  font-weight: 700;
+}
+
+.emb-add {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+
+  & .explorable-input {
+    flex: 1 1 auto;
+  }
+}
+
 // ── attention ────────────────────────────────────────────────────────────────
 .attn-sentence {
   display: flex;

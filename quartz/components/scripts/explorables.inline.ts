@@ -238,11 +238,101 @@ function mountEmbeddings(el: HTMLElement) {
   })
 
   el.appendChild(svg)
-  el.appendChild(
-    caption(
-      "Hover a word: nearby words mean similar things. Real embeddings live in hundreds of dimensions, this is a 2-D shadow.",
-    ),
+
+  // let the reader drop their own word onto the map, placed by *real* MiniLM
+  // similarity to the anchor words (a similarity-weighted position)
+  const form = document.createElement("form")
+  form.className = "emb-add"
+  const inp = document.createElement("input")
+  inp.type = "text"
+  inp.className = "explorable-input"
+  inp.placeholder = "type a word to place it (wolf, sadness, java…)"
+  inp.setAttribute("aria-label", "Type a word to place on the map")
+  const btn = document.createElement("button")
+  btn.type = "submit"
+  btn.className = "explorable-btn"
+  btn.textContent = "Place"
+  form.append(inp, btn)
+  const note = caption(
+    "Hover a word: nearby words mean similar things. Real embeddings live in hundreds of dimensions, this is a 2-D shadow. Type your own word to drop it on the map by meaning.",
   )
+  el.append(form, note)
+
+  let anchorVecs: number[][] | null = null
+  const softmax = (xs: number[], t: number) => {
+    const m = Math.max(...xs)
+    const ex = xs.map((x) => Math.exp((x - m) * t))
+    const s = ex.reduce((a, b) => a + b, 0) || 1
+    return ex.map((e) => e / s)
+  }
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault()
+    const word = inp.value.trim().toLowerCase()
+    if (!word) return
+    btn.disabled = true
+    const prev = note.textContent
+    note.textContent = "Embedding your word in the browser…"
+    try {
+      const emb = await getEmbedder()
+      if (!anchorVecs) {
+        anchorVecs = []
+        for (const a of EMB_WORDS) {
+          const o = await emb(a.w, { pooling: "mean", normalize: true })
+          anchorVecs.push(Array.from(o.data as Float32Array))
+        }
+      }
+      const o = await emb(word, { pooling: "mean", normalize: true })
+      const v = Array.from(o.data as Float32Array)
+      const sims = anchorVecs.map((av) => {
+        let s = 0
+        for (let i = 0; i < av.length; i++) s += av[i] * v[i]
+        return s
+      })
+      const wts = softmax(sims, 12)
+      let x = 0
+      let y = 0
+      EMB_WORDS.forEach((a, i) => {
+        x += wts[i] * a.x
+        y += wts[i] * a.y
+      })
+      const near = sims
+        .map((s, i) => ({ i, s }))
+        .sort((p, q) => q.s - p.s)
+        .slice(0, 3)
+      near.forEach(({ i }) => {
+        linkLayer.appendChild(
+          svgEl("line", {
+            x1: px(x),
+            y1: py(y),
+            x2: px(EMB_WORDS[i].x),
+            y2: py(EMB_WORDS[i].y),
+            stroke: cssVar("--tertiary"),
+            "stroke-width": 1.5,
+            "stroke-dasharray": "3 3",
+          }),
+        )
+      })
+      const g = svgEl("g", { class: "emb-node emb-user active" })
+      const dot = svgEl("circle", { cx: px(x), cy: py(y), r: 6, fill: cssVar("--tertiary") })
+      const label = svgEl("text", {
+        x: px(x) + 9,
+        y: py(y) + 4,
+        class: "emb-label",
+        fill: cssVar("--secondary"),
+      })
+      label.textContent = word
+      g.append(dot, label)
+      svg.appendChild(g)
+      note.textContent = `“${word}” placed by meaning, nearest to ${near
+        .map((n) => EMB_WORDS[n.i].w)
+        .join(", ")}.`
+      inp.value = ""
+    } catch {
+      note.textContent = prev
+    } finally {
+      btn.disabled = false
+    }
+  })
 }
 
 // ── 3. Attention ────────────────────────────────────────────────────────────
