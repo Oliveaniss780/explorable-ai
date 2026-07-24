@@ -8,6 +8,7 @@ import { letterpressOgImage } from "./quartz/util/ogTemplate"
 const config: QuartzConfig = {
   configuration: {
     pageTitle: "Oliveaniss",
+    pageTitleSuffix: " · Explorable AI",
     enableSPA: true,
     enablePopovers: true,
     analytics: {
