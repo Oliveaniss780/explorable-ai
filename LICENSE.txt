@@ -3,11 +3,6 @@ MIT License
 Copyright (c) 2021 jackyzha0
 Copyright (c) 2026 Recandle
 
-This project is built on Quartz (https://github.com/jackyzha0/quartz) by
-jackyzha0, used and modified under the MIT licence. The notice above is
-retained as that licence requires. The second line covers the changes and
-additions made here.
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -25,3 +20,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+This project is built on Quartz (https://github.com/jackyzha0/quartz) by
+jackyzha0, used and modified under the MIT licence. The first copyright line
+above is his, retained as that licence requires. The second covers the changes
+and additions made here.
