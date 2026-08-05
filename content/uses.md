@@ -8,7 +8,7 @@ _A running list of the tools I reach for. Inspired by [uses.tech](https://uses.t
 ## Making the explainers
 
 - **Visualizations:** hand-written SVG and `<canvas>`, driven by the site's theme variables so every widget flips with light/dark mode.
-- **This site:** a **custom static-site generator** that turns Markdown into a linked digital garden. The interactive widgets are mounted from plain `<div>` placeholders dropped into Markdown.
+- **This site:** [Quartz](https://github.com/jackyzha0/quartz) by [jackyzha0](https://github.com/jackyzha0), which turns Markdown into a linked digital garden. I modified it so the interactive widgets mount from plain `<div>` placeholders dropped into Markdown.
 
 ## Writing & thinking
 

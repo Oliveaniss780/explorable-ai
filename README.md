@@ -107,14 +107,14 @@ Two warm, two-ink palettes: an oat-milk "latte" for day and a deep-espresso "cac
 
 | Piece | Role |
 |---|---|
-| **Static-site engine** | A heavily customised open-source static-site generator (MIT) that turns a folder of Markdown into a linked website |
+| **[Quartz](https://github.com/jackyzha0/quartz)** | The static-site engine, by [jackyzha0](https://github.com/jackyzha0), MIT licensed. Turns a folder of Markdown into a linked website. Customised here, but the build pipeline, component model, and plugin architecture are Quartz's |
 | **Preact** | Rendered to static HTML at build time |
 | **unified / remark / rehype** | The Markdown-to-HTML pipeline, with KaTeX for maths and Shiki for syntax highlighting |
 | **Transformers.js** | In-browser embedding model behind "ask the garden" and the meaning-map |
 | **WebLLM** | In-browser chat model behind the floating Ask AI assistant |
 | **Pixi / WebGL** | The home-page node graph |
 
-Most of the interactive widgets live in one script file; the floating assistant is another. Everything else is the static-site engine.
+Most of the interactive widgets live in one script file; the floating assistant is another. Everything else is Quartz.
 
 ## Running it locally
 
@@ -137,11 +137,15 @@ content/            the garden itself: every note and essay, in Markdown
 api/                serverless functions (the MCP server)
 ```
 
-Everything else is the static-site engine and its config: the theme and fonts, the page components and explorable widgets, and the layout of each page.
+```
+quartz/             the Quartz engine, with my modifications
+```
+
+Everything under `quartz/` is Quartz plus my changes to it: the theme and fonts, the page components and explorable widgets, and the layout of each page.
 
 ## Make your own
 
-This repository is a template, so you can grow your own garden from it without touching the engine.
+You can grow your own garden from this repo without touching the engine. If you only want the engine, start from [Quartz itself](https://github.com/jackyzha0/quartz) instead — it is the better starting point, and better documented.
 
 1. **Start from it.** Click **[Use this template](https://github.com/Recandle/explorable-ai/generate)** for your own copy, or the **Deploy with Vercel** button above to get a live site in one step.
 2. **Write.** Everything the site shows lives in `content/` as Markdown. Delete mine and add yours; links between notes use `[[wikilink]]` syntax, and the graph builds itself from them.
@@ -154,4 +158,8 @@ The one-click **Deploy with Vercel** button reads `vercel.json` for you (build w
 
 ## Credits
 
-Built on an open-source static-site generator (MIT); its licence is preserved in `LICENSE.txt`. Everything under `content/` (the writing, the widget designs, the palette) is mine.
+This site runs on **[Quartz](https://github.com/jackyzha0/quartz)** by **[jackyzha0](https://github.com/jackyzha0)**, used and modified under the MIT licence. The engine, its build pipeline, and its component and plugin architecture are his work, not mine — `LICENSE.txt` carries his copyright notice alongside mine.
+
+What is mine is everything under `content/` — the writing, the concept notes, the explorable widget designs, and the palette — plus the modifications to the engine that make those widgets work.
+
+Thanks also to the projects the explorables lean on: Transformers.js and WebLLM for running models in the browser, Pixi for the graph, and KaTeX and Shiki for maths and code.
