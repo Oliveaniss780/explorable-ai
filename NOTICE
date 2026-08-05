@@ -1,0 +1,10 @@
+This project is built on Quartz (https://github.com/jackyzha0/quartz) by
+jackyzha0, used and modified under the MIT licence.
+
+Everything under `quartz/` is Quartz plus modifications: the build pipeline,
+the component model, and the plugin architecture are his work. The writing in
+`content/`, the explorable widgets, and the theme are the additions made here.
+
+LICENSE.txt carries two copyright lines for that reason. The first is
+jackyzha0's, retained as the MIT licence requires. The second covers the
+changes and additions made in this repository.
