@@ -94,7 +94,7 @@ export default (() => {
         <meta name="theme-color" content="#f4ede1" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#241c15" media="(prefers-color-scheme: dark)" />
         <meta name="description" content={description} />
-        <meta name="generator" content="Oliveaniss" />
+        <meta name="generator" content="Recandle" />
         <link href={fontStylePath} rel="stylesheet" type="text/css" spa-preserve />
         {css.map((resource) => CSSResourceToStyleElement(resource, true))}
         {js

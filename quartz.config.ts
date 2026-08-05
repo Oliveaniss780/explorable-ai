@@ -3,11 +3,11 @@ import * as Plugin from "./quartz/plugins"
 import { letterpressOgImage } from "./quartz/util/ogTemplate"
 
 /**
- * Site configuration for the Oliveaniss garden.
+ * Site configuration for the Recandle garden.
  */
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "Oliveaniss",
+    pageTitle: "Recandle",
     pageTitleSuffix: " · Explorable AI",
     enableSPA: true,
     enablePopovers: true,

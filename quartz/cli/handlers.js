@@ -217,7 +217,7 @@ Edit files in \`content/\` to grow your garden.
 
   // setup remote
   execSync(
-    `git remote show upstream || git remote add upstream https://github.com/Oliveaniss780/explorable-ai.git`,
+    `git remote show upstream || git remote add upstream https://github.com/Recandle/explorable-ai.git`,
     { stdio: "ignore" },
   )
 
@@ -495,7 +495,7 @@ export async function handleUpdate(argv) {
   console.log(`\n${styleText(["bgGreen", "black"], ` Quartz v${version} `)} \n`)
   console.log("Backing up your content")
   execSync(
-    `git remote show upstream || git remote add upstream https://github.com/Oliveaniss780/explorable-ai.git`,
+    `git remote show upstream || git remote add upstream https://github.com/Recandle/explorable-ai.git`,
   )
   await stashContentFolder(contentFolder)
   console.log(

@@ -1,4 +1,4 @@
-# Oliveaniss
+# Recandle
 
 *Interactive explainers that compute how AI works, live in your browser.*
 
@@ -11,9 +11,9 @@
 <p align="center">
   <a href="https://explorable-ai.vercel.app"><b>Live demo</b></a>
   &nbsp;·&nbsp;
-  <a href="https://github.com/Oliveaniss780/explorable-ai/generate"><b>Use this template</b></a>
+  <a href="https://github.com/Recandle/explorable-ai/generate"><b>Use this template</b></a>
   &nbsp;·&nbsp;
-  <a href="https://vercel.com/new/clone?repository-url=https://github.com/Oliveaniss780/explorable-ai"><img src="https://vercel.com/button" alt="Deploy with Vercel" height="26" align="center"></a>
+  <a href="https://vercel.com/new/clone?repository-url=https://github.com/Recandle/explorable-ai"><img src="https://vercel.com/button" alt="Deploy with Vercel" height="26" align="center"></a>
 </p>
 
 Most explanations of machine learning hand you one of two things: a wall of equations, or a metaphor so loose it falls apart the moment you lean on it. I wanted a third option: pages you can poke at. Every idea here (tokens, embeddings, attention, sampling, training) comes with a small widget you can type into, drag, or watch run. Change the input and the whole thing recomputes in front of you.
@@ -143,7 +143,7 @@ Everything else is the static-site engine and its config: the theme and fonts, t
 
 This repository is a template, so you can grow your own garden from it without touching the engine.
 
-1. **Start from it.** Click **[Use this template](https://github.com/Oliveaniss780/explorable-ai/generate)** for your own copy, or the **Deploy with Vercel** button above to get a live site in one step.
+1. **Start from it.** Click **[Use this template](https://github.com/Recandle/explorable-ai/generate)** for your own copy, or the **Deploy with Vercel** button above to get a live site in one step.
 2. **Write.** Everything the site shows lives in `content/` as Markdown. Delete mine and add yours; links between notes use `[[wikilink]]` syntax, and the graph builds itself from them.
 3. **Re-theme.** The two colour palettes and the three fonts are a few lines near the top of the site config. Swap them and the whole site (and every widget) follows.
 4. **Add explorables.** Drop a placeholder like `<div class="explorable" data-explorable="attention"></div>` into any note. The widgets are all defined in one script file.

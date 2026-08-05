@@ -1453,7 +1453,7 @@ function mountTokenizeCard(el: HTMLElement) {
 // ── 12. GitHub contribution calendar (themed) ───────────────────────────────
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 function mountCommits(el: HTMLElement) {
-  const user = el.dataset.user || "Oliveaniss"
+  const user = el.dataset.user || "Recandle"
   const holder = document.createElement("div")
   holder.className = "cal-holder"
   const status = caption(`Loading commit activity for @${user}…`)

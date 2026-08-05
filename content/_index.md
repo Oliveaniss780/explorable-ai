@@ -1,5 +1,5 @@
 ---
-title: "Oliveaniss"
+title: "Recandle"
 tags:
   - evergreen
 ---
@@ -36,8 +36,8 @@ The [[thoughts/llm|concept notes]] are a small linked encyclopedia of AI terms. 
 
 And my GitHub commits over the last year, pulled in live:
 
-<div class="explorable" data-explorable="commits" data-user="Oliveaniss780"></div>
+<div class="explorable" data-explorable="commits" data-user="Recandle"></div>
 
 ```poetry
-- Oliveaniss
+- Recandle
 ```

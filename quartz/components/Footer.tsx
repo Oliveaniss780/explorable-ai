@@ -61,7 +61,7 @@ export default ((opts?: Options) => {
           </ul>
         </nav>
         <div class="footer-bottom">
-          <p class="footer-meta">© {year} Oliveaniss · Explorable AI</p>
+          <p class="footer-meta">© {year} Recandle · Explorable AI</p>
           {Object.keys(links).length > 0 && (
             <nav class="footer-social" aria-label="Elsewhere">
               <ul>

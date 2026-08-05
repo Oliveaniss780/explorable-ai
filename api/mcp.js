@@ -1,4 +1,4 @@
-// A remote MCP (Model Context Protocol) server for the Oliveaniss garden.
+// A remote MCP (Model Context Protocol) server for the Recandle garden.
 // Streamable HTTP transport: clients POST JSON-RPC 2.0 messages here and get a
 // JSON response back. It exposes the garden's notes as tools + resources, so
 // any MCP client (Claude, Cursor, VS Code) can search and read the garden.
@@ -35,7 +35,7 @@ const TOOLS = [
   {
     name: "search_notes",
     description:
-      "Search the Oliveaniss 'Explorable AI' garden for notes about how AI works (tokens, embeddings, attention, and more). Returns the closest matching notes.",
+      "Search the Recandle 'Explorable AI' garden for notes about how AI works (tokens, embeddings, attention, and more). Returns the closest matching notes.",
     inputSchema: {
       type: "object",
       properties: { query: { type: "string", description: "Keywords to search for." } },
@@ -69,7 +69,7 @@ async function handleMessage(m, origin) {
           capabilities: { tools: {}, resources: {} },
           serverInfo: SERVER_INFO,
           instructions:
-            "Exposes the notes of the Oliveaniss 'Explorable AI' garden. Use search_notes to find notes, then get_note (or read a note:// resource) to read one.",
+            "Exposes the notes of the Recandle 'Explorable AI' garden. Use search_notes to find notes, then get_note (or read a note:// resource) to read one.",
         })
 
       case "ping":

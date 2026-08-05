@@ -31,4 +31,4 @@ A single site-wide script scans every page for these placeholders and hydrates t
 
 Set in DM Serif Display, Bricolage Grotesque, and JetBrains Mono, over a two-ink palette that inverts from warm-paper day to cyanotype night.
 
-_The full source lives on [GitHub](https://github.com/Oliveaniss780)._
+_The full source lives on [GitHub](https://github.com/Recandle)._

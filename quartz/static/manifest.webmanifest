@@ -1,7 +1,7 @@
 {
-  "name": "Oliveaniss",
-  "short_name": "Oliveaniss",
-  "description": "Oliveaniss — a digital garden of writing and notes.",
+  "name": "Recandle",
+  "short_name": "Recandle",
+  "description": "Recandle — a digital garden of writing and notes.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
