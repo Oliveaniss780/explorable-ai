@@ -1402,7 +1402,7 @@ function mountTokenizeCard(el: HTMLElement) {
     ctx.textBaseline = "top"
     ctx.fillStyle = gray
     ctx.font = "600 26px sans-serif"
-    ctx.fillText("OLIVEANISS · EXPLORABLE AI", 60, 52)
+    ctx.fillText("RECANDLE · EXPLORABLE AI", 60, 52)
     const toks = approxTokens(input.value)
     ctx.font = "30px monospace"
     let x = 60
@@ -1423,12 +1423,12 @@ function mountTokenizeCard(el: HTMLElement) {
     })
     ctx.fillStyle = gray
     ctx.font = "22px sans-serif"
-    ctx.fillText(`${toks.length} tokens · oliveaniss.xyz`, 60, H - 56)
+    ctx.fillText(`${toks.length} tokens · explorable-ai.vercel.app`, 60, H - 56)
   }
   const updateShare = () => {
     const txt = `I tokenized "${input.value.slice(0, 80)}", see how AI reads text:`
     sh.href = `https://x.com/intent/tweet?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(
-      "https://oliveaniss.xyz/posts/tokens-the-atoms-of-llms",
+      "https://explorable-ai.vercel.app/posts/tokens-the-atoms-of-llms",
     )}`
   }
   input.addEventListener("input", () => {

@@ -1,15 +1,15 @@
 {
-  "name": "@oliveaniss/quartz",
-  "description": "🌱 publish your digital garden and notes as a website",
+  "name": "recandle-garden",
+  "description": "Recandle, an explorable AI digital garden",
   "private": true,
   "version": "4.5.1",
   "type": "module",
-  "author": "Oliveaniss",
+  "author": "Recandle",
   "license": "MIT",
-  "homepage": "https://oliveaniss.xyz",
+  "homepage": "https://explorable-ai.vercel.app",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Oliveaniss/quartz.git"
+    "url": "https://github.com/Recandle/explorable-ai.git"
   },
   "scripts": {
     "quartz": "./quartz/bootstrap-cli.mjs",

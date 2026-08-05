@@ -7,7 +7,7 @@ import { BuildCtx } from "../../util/ctx"
 // Minimal stale-while-revalidate service worker. Emitted to the site root so its
 // scope covers every page (a worker under /static/ could only control /static/).
 const swSource = `/* generated service worker — stale-while-revalidate for same-origin GETs */
-const CACHE = "oliveaniss-cache-v1"
+const CACHE = "recandle-cache-v1"
 
 self.addEventListener("install", () => self.skipWaiting())
 

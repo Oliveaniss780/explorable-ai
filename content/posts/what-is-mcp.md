@@ -44,7 +44,7 @@ https://explorable-ai.vercel.app/api/mcp
 ```json
 {
   "mcpServers": {
-    "oliveaniss-garden": {
+    "recandle-garden": {
       "url": "https://explorable-ai.vercel.app/api/mcp"
     }
   }
@@ -56,7 +56,7 @@ https://explorable-ai.vercel.app/api/mcp
 ```json
 {
   "mcpServers": {
-    "oliveaniss-garden": {
+    "recandle-garden": {
       "command": "npx",
       "args": ["mcp-remote", "https://explorable-ai.vercel.app/api/mcp"]
     }

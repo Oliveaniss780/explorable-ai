@@ -5,7 +5,7 @@
 export const config = { runtime: "edge" }
 
 const PROTOCOL_VERSION = "2025-06-18"
-const SERVER_INFO = { name: "oliveaniss-garden", version: "1.0.0" }
+const SERVER_INFO = { name: "recandle-garden", version: "1.0.0" }
 
 let cache = null
 async function loadNotes(origin) {
